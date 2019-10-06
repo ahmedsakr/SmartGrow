@@ -24,3 +24,5 @@ The idea is brought to life by a distributed set of systems communicating throug
 <div style="text-align: center;">
     <img alt="SmartGrow System Architecture" src="./smartgrow-architecture.jpg"/>
 </div>
+
+bla bla bla
