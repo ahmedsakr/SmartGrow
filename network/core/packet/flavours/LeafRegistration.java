@@ -11,10 +11,21 @@ public class LeafRegistration extends Packet {
     /**
      * 
      */
-    public LeafRegistration(Identity identity) {
-        super((byte)PacketCodes.LEAF_REGISTRATION);
+    public LeafRegistration() {
+        super(PacketCodes.LEAF_REGISTRATION);
+    }
 
+    public Identity getIdentity() {
+        return this.identity;
+    }
+
+    public void setIdentity(Identity identity) {
         this.identity = identity;
+    }
+
+    @Override
+    protected void extract(byte[] payload) {
+        this.setIdentity(Identity.PLANT_ENDPOINT);
     }
 
     @Override

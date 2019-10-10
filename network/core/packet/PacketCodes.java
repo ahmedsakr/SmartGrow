@@ -2,5 +2,5 @@ package network.core.packet;
 
 public class PacketCodes {
 
-    public static final int LEAF_REGISTRATION = 0;
+    public static final byte LEAF_REGISTRATION = 0;
 }

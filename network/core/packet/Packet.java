@@ -2,6 +2,10 @@ package network.core.packet;
 
 import java.util.ArrayList;
 import java.util.zip.CRC32;
+
+import network.core.packet.flavours.LeafRegistration;
+import network.core.packet.CorruptPacketException;
+
 import java.util.Collections;
 
 public abstract class Packet {
@@ -22,12 +26,39 @@ public abstract class Packet {
     }
 
     /**
-     * Subclass implementation of what should be built into the packet.
-     * 
-     * The subclass would use the addInt(), addBoolean(), and addString()
-     * methods to construct the packet.
+     * Creates a Packet subclass based on the opcode.
+     * @return
      */
-    protected abstract void build();
+    public static Packet fromPayload(byte[] payload) throws CorruptPacketException {
+        if (payload.length != PACKET_SIZE) {
+            throw new CorruptPacketException("Packet size is not 512 bytes");
+        } else {
+        }
+
+        Packet pkt = null;
+        switch (payload[0]) {
+
+            case PacketCodes.LEAF_REGISTRATION:
+                pkt = new LeafRegistration();
+                break;
+            default:
+                throw new CorruptPacketException("Packet OpCode is not recognized");
+        }
+
+        if (!pkt.verifyPacket(payload)) {
+            throw new CorruptPacketException("CRC check failed");
+        }
+
+        pkt.extract(payload);
+        return pkt;
+    }
+
+    protected boolean verifyPacket(byte[] payload) {
+        this.crc.reset();
+        this.crc.update(payload);
+
+        return this.crc.getValue() == 0L;
+    }
 
     /**
      * Produce a clone of the packet data.
@@ -68,6 +99,20 @@ public abstract class Packet {
         // error detection codes.
         return PACKET_SIZE - this.size - 4;
     }
+
+    /**
+     * Subclass implementation for extracting the packet information from a
+     * received payload.
+     */
+    protected abstract void extract(byte[] payload);
+
+    /**
+     * Subclass implementation of what should be built into the packet.
+     * 
+     * The subclass would use the addInt(), addBoolean(), and addString()
+     * methods to construct the packet.
+     */
+    protected abstract void build();
 
     /**
      * Appends a byte to the packet.
