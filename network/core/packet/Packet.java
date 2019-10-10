@@ -4,14 +4,17 @@ import java.util.ArrayList;
 import java.util.zip.CRC32;
 import java.util.Collections;
 
-public abstract class Packet implements PacketBuilder {
+public abstract class Packet {
+
+    // All packets are fixed to be 512 bytes at all times.
+    public static final int PACKET_SIZE = 512;
 
     private CRC32 crc;
     private byte[] data;
     private int size;
 
     public Packet(byte opcode) {
-        this.data = new byte[PacketBuilder.PACKET_SIZE];
+        this.data = new byte[PACKET_SIZE];
         this.data[0] = opcode;
         this.size = 1;
 
@@ -63,7 +66,7 @@ public abstract class Packet implements PacketBuilder {
 
         // The last 4 bytes of the packet are reserved for Cyclic Redundancy Check (CRC)
         // error detection codes.
-        return PacketBuilder.PACKET_SIZE - this.size - 4;
+        return PACKET_SIZE - this.size - 4;
     }
 
     /**
@@ -71,7 +74,7 @@ public abstract class Packet implements PacketBuilder {
      * 
      * @param value The byte value to be stored in the packet
      */
-    public void addByte(byte value) {
+    protected void addByte(byte value) {
         if (this.getFreeSpace() == 0) {
             return;
         }
@@ -85,7 +88,7 @@ public abstract class Packet implements PacketBuilder {
      * 
      * @param value The integer value to be stored in the packet
      */
-    public void addInt(int value) {
+    protected void addInt(int value) {
         if (this.getFreeSpace() - Integer.BYTES < 0) {
             return;
         }
@@ -100,7 +103,7 @@ public abstract class Packet implements PacketBuilder {
      * 
      * @param value The string being inserted into the packet.
      */
-    public void addString(String value) {
+    protected void addString(String value) {
         if (this.getFreeSpace() - value.length() + 1 < 0) {
             return;
         }
@@ -118,7 +121,7 @@ public abstract class Packet implements PacketBuilder {
      * 
      * @param value The boolean being inserted into the packet
      */
-    public void addBoolean(boolean value) {
+    protected void addBoolean(boolean value) {
         if (this.getFreeSpace() == 0) {
             return;
         }
