@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.zip.CRC32;
 import java.util.Collections;
 
-public class Packet implements PacketBuilder {
+public abstract class Packet implements PacketBuilder {
 
     private CRC32 crc;
     private byte[] data;
@@ -18,13 +18,42 @@ public class Packet implements PacketBuilder {
         this.crc = new CRC32();
     }
 
-    public byte[] produceData() {
+    /**
+     * Subclass implementation of what should be built into the packet.
+     * 
+     * The subclass would use the addInt(), addBoolean(), and addString()
+     * methods to construct the packet.
+     */
+    protected abstract void build();
+
+    /**
+     * Produce a clone of the packet data.
+     * 
+     * @return 512 byte-array payload
+     */
+    public byte[] getData() {
+        return this.data.clone();
+    }
+
+    /**
+     * Compile the data by calling upon the subclass build method to populate
+     * the data. Once the data is populated, a CRC is calculated and appended
+     * to the end of the packet.
+     *
+     */
+    public void compile() {
+        
+        // Reset the packet data by moving the size back to 1.
+        this.size = 1;
+
+        // Invoke the subclass implementation to bring the packet contents in.
+        this.build();
+
         if (this.getFreeSpace() > 0) {
             this.pad();
         }
 
         System.arraycopy(this.computeCRC(), 0, this.data, this.data.length - 4, 4);
-        return this.data.clone();
     }
 
     /**
@@ -38,18 +67,64 @@ public class Packet implements PacketBuilder {
     }
 
     /**
+     * Appends a byte to the packet.
+     * 
+     * @param value The byte value to be stored in the packet
+     */
+    public void addByte(byte value) {
+        if (this.getFreeSpace() == 0) {
+            return;
+        }
+
+        this.data[size] = value;
+        this.size++;
+    }
+
+    /**
      * Appends an integer to the packet.
      * 
      * @param value The integer value to be stored in the packet
      */
     public void addInt(int value) {
-        if (this.getFreeSpace() - Integer.BYTES <= 0) {
+        if (this.getFreeSpace() - Integer.BYTES < 0) {
             return;
         }
 
         // Copy the bytes into the array.
         System.arraycopy(this.convertIntToBytes(value), 0, this.data, this.size, Integer.BYTES);
         this.size += Integer.BYTES;
+    }
+
+    /**
+     * Appends a string and a trailing null-byte ('\0') to the packet.
+     * 
+     * @param value The string being inserted into the packet.
+     */
+    public void addString(String value) {
+        if (this.getFreeSpace() - value.length() + 1 < 0) {
+            return;
+        }
+
+        System.arraycopy(value.getBytes(), 0, this.data, this.size, value.length());
+        this.size += value.length();
+        
+        // Add the trailing null-byte to the packet to delimit the string.
+        this.data[size] = 0;
+        this.size++;
+    }
+
+    /**
+     * Appends a boolean into the packet.
+     * 
+     * @param value The boolean being inserted into the packet
+     */
+    public void addBoolean(boolean value) {
+        if (this.getFreeSpace() == 0) {
+            return;
+        }
+
+        this.data[size] = value == true ? (byte)1 : (byte)0;
+        this.size++;
     }
 
     /**
