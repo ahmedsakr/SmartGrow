@@ -1,4 +1,4 @@
-package network.core.packet;
+package network.core;
 
 public class PacketCodes {
 

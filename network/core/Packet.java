@@ -1,13 +1,25 @@
-package network.core.packet;
+package network.core;
 
 import java.util.ArrayList;
 import java.util.zip.CRC32;
 
-import network.core.packet.flavours.LeafRegistration;
-import network.core.packet.CorruptPacketException;
+import network.core.packets.LeafRegistration;
+import network.core.CorruptPacketException;
 
-import java.util.Collections;
-
+/**
+ * Payloads are expected to follow the form of well-known packets
+ * within the SmartGrow Network.
+ * 
+ * This class provides the abstraction needed to support the
+ * Packet necessity in the network. A packet will carry all
+ * data communicated within the network.
+ * 
+ * Integrity verification is also enabled within Packets
+ * using Cyclic Redundancy Checks (CRC32 specifically).
+ * 
+ * @author Ahmed Sakr
+ * @since October 10, 2019
+ */
 public abstract class Packet {
 
     // All packets are fixed to be 512 bytes at all times.
@@ -17,6 +29,11 @@ public abstract class Packet {
     private byte[] data;
     private int size;
 
+    /**
+     * The constructor for the Packet object
+     * 
+     * @param opcode The operation code for the packet
+     */
     public Packet(byte opcode) {
         this.data = new byte[PACKET_SIZE];
         this.data[0] = opcode;
@@ -32,12 +49,10 @@ public abstract class Packet {
     public static Packet fromPayload(byte[] payload) throws CorruptPacketException {
         if (payload.length != PACKET_SIZE) {
             throw new CorruptPacketException("Packet size is not 512 bytes");
-        } else {
         }
 
         Packet pkt = null;
         switch (payload[0]) {
-
             case PacketCodes.LEAF_REGISTRATION:
                 pkt = new LeafRegistration();
                 break;
@@ -45,6 +60,7 @@ public abstract class Packet {
                 throw new CorruptPacketException("Packet OpCode is not recognized");
         }
 
+        // Verify the integrity of the packet using the CRC32 checksum
         if (!pkt.verifyPacket(payload)) {
             throw new CorruptPacketException("CRC check failed");
         }
@@ -53,6 +69,14 @@ public abstract class Packet {
         return pkt;
     }
 
+    /**
+     * Verify the payload using the CRC32 at the end of the payload.
+     * 
+     * @param payload A 512-byte array (with the last 4 bytes being the CRC32)
+     * 
+     * @return        true      if the payload is valid
+     *                false     otherwise
+     */
     protected boolean verifyPacket(byte[] payload) {
         this.crc.reset();
         this.crc.update(payload);
@@ -87,6 +111,8 @@ public abstract class Packet {
             this.pad();
         }
 
+        // Calculate the checksum using the payload data and insert it in the
+        // last 4 bytes in the array.
         System.arraycopy(this.computeCRC(), 0, this.data, this.data.length - 4, 4);
     }
 

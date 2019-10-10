@@ -1,7 +1,7 @@
-package network.core.packet.flavours;
+package network.core.packets;
 
-import network.core.packet.Packet;
-import network.core.packet.PacketCodes;
+import network.core.Packet;
+import network.core.PacketCodes;
 import network.leaf.Identity;
 
 public class LeafRegistration extends Packet {
