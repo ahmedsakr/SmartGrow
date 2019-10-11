@@ -1,6 +1,6 @@
 package network.core;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.zip.CRC32;
 
 import network.core.packets.LeafRegistration;
@@ -79,9 +79,10 @@ public abstract class Packet {
      */
     protected boolean verifyPacket(byte[] payload) {
         this.crc.reset();
-        this.crc.update(payload);
+        this.crc.update(payload, 0, payload.length - 4);
+        byte[] payload_crc = Arrays.copyOfRange(payload, payload.length - 4, payload.length);
 
-        return this.crc.getValue() == 0L;
+        return (int)this.crc.getValue() == this.convertBytesToInt(payload_crc);
     }
 
     /**
@@ -229,10 +230,7 @@ public abstract class Packet {
      */
     private byte[] convertIntToBytes(int value) {
         return new byte[] {
-            (byte)((value >> 24) & 0xFF),
-            (byte)((value >> 16) & 0xFF),
-            (byte)((value >> 8) & 0xFF),
-            (byte)(value & 0xFF)
+            (byte)((value >> 24)), (byte)((value >> 16)), (byte)((value >> 8)), (byte)(value)
         };
     }
 
@@ -240,6 +238,9 @@ public abstract class Packet {
      * Converts a Big-Endian byte array to its integer representation.
      */
     private int convertBytesToInt(byte[] array) {
-        return (int)(array[0] << 24) + (int)(array[1] << 16) + (int)(array[2] << 8) + array[3];
+        return  (int)((array[0] << 24) & 0xFF000000) +
+                (int)((array[1] << 16) & 0x00FF0000) +
+                (int)((array[2] << 8) & 0x0000FF00) +
+                (int)(array[3] & 0xFF);
     }
 }

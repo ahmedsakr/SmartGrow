@@ -25,7 +25,8 @@ public class LeafRegistration extends Packet {
 
     @Override
     protected void extract(byte[] payload) {
-        this.setIdentity(Identity.PLANT_ENDPOINT);
+        Identity identity = payload[1] == 1 ? Identity.ANDROID_USER : Identity.PLANT_ENDPOINT;
+        this.setIdentity(identity);
     }
 
     @Override
