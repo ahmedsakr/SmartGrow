@@ -1,5 +1,8 @@
 package network.core;
 
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.zip.CRC32;
 
@@ -29,6 +32,8 @@ public abstract class Packet {
     private byte[] data;
     private int size;
 
+    private DatagramPacket packet;
+
     /**
      * The constructor for the Packet object
      * 
@@ -40,6 +45,18 @@ public abstract class Packet {
         this.size = 1;
 
         this.crc = new CRC32();
+        this.packet = new DatagramPacket(this.data, this.data.length);
+    }
+
+    /**
+     * Set the target destination ip and port for this packet.
+     * 
+     * @param ip The hostname of the recepient
+     * @param port The remote port number of the recepient 
+     */
+    public void setDestination(String ip, int port) throws UnknownHostException {
+        this.packet.setAddress(InetAddress.getByName(ip));
+        this.packet.setPort(port);
     }
 
     /**
@@ -86,12 +103,12 @@ public abstract class Packet {
     }
 
     /**
-     * Produce a clone of the packet data.
+     * Provide the fully qualified DatagramPacket.
      * 
-     * @return 512 byte-array payload
+     * @return The finalized DatagramPacket
      */
-    public byte[] getData() {
-        return this.data.clone();
+    public DatagramPacket getDatagram() {
+        return this.packet;
     }
 
     /**
