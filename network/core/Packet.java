@@ -138,6 +138,8 @@ public abstract class Packet {
      * 
      * The subclass would use the addInt(), addBoolean(), and addString()
      * methods to construct the packet.
+     * 
+     * Order of addition matters. This defines the format of the packet.
      */
     protected abstract void build();
 
