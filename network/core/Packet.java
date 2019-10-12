@@ -49,6 +49,24 @@ public abstract class Packet {
     }
 
     /**
+     * Retrieve the packet destination's IP address.
+     * 
+     * @return IPv4 address of the destination
+     */
+    public String getAddress() {
+        return this.packet.getAddress().getHostAddress();
+    }
+
+    /**
+     * Retrieve the packet destination's port address.
+     * 
+     * @return The remote port number of the destination
+     */
+    public int getPort() {
+        return this.packet.getPort();
+    }
+
+    /**
      * Set the target destination ip and port for this packet.
      * 
      * @param ip The hostname of the recepient
