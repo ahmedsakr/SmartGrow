@@ -90,7 +90,7 @@ public abstract class Packet {
 
         Packet pkt = null;
         switch (payload[0]) {
-            case PacketCodes.LEAF_REGISTRATION:
+            case OpCodes.LEAF_REGISTRATION:
                 pkt = new LeafRegistration();
                 break;
             default:
