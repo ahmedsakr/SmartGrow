@@ -6,6 +6,8 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import network.core.exceptions.CorruptPacketException;
+
 /**
  * Transport is developed to abstract UDP intricacies away
  * from the workflow. Using Transport, All ends in the 
