@@ -10,4 +10,5 @@ package network.core;
 public class OpCodes {
 
     public static final byte LEAF_REGISTRATION = 0;
+    public static final byte REGISTRATION_RESPONSE = 1;
 }

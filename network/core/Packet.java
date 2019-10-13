@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.zip.CRC32;
 
 import network.core.packets.LeafRegistration;
+import network.core.packets.RegistrationResponse;
 import network.core.exceptions.CRCVerificationException;
 import network.core.exceptions.CorruptPacketException;
 import network.core.exceptions.OpCodeNotRecognizedException;
@@ -92,6 +93,9 @@ public abstract class Packet {
         switch (payload[0]) {
             case OpCodes.LEAF_REGISTRATION:
                 pkt = new LeafRegistration();
+                break;
+            case OpCodes.REGISTRATION_RESPONSE:
+                pkt = new RegistrationResponse();
                 break;
             default:
                 throw new OpCodeNotRecognizedException("Packet OpCode is not recognized");
