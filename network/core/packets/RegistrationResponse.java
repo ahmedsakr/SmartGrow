@@ -25,7 +25,7 @@ public class RegistrationResponse extends Packet {
      * @return  true        Leaf registration succeeded
      *          false       Leaf registration failed
      */
-    public boolean getStatus() {
+    public boolean isRegistered() {
         return this.status;
     }
 
