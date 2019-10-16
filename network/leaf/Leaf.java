@@ -132,12 +132,10 @@ public class Leaf extends Transport {
                     super.send(registration);
                     RegistrationResponse response = (RegistrationResponse) super.receive();
 
-                    if (response.getStatus()) {
-                        this.registered = true;
-                    } else {
-
+                    this.registered = response.isRegistered();
+                    if (!response.isRegistered()) {
+                        
                         // TODO: how to recover from a failure to register with the server?
-                        this.registered = false;
                     }
                     
                     this.branchAddress = response.getAddress();
