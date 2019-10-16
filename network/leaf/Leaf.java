@@ -2,7 +2,6 @@ package network.leaf;
 
 import java.io.IOException;
 import java.net.SocketException;
-import java.util.Random;
 
 import network.Configuration;
 import network.core.Packet;
@@ -46,6 +45,19 @@ public class Leaf extends Transport {
     private int branchPort;
 
     /**
+     * Create a Leaf with a provided identity.
+     * 
+     * @param identity The identity of this leaf (Android user or Plant endpoint)
+     */
+    public Leaf(Identity identity) throws SocketException {
+        super();
+        this.identity = identity;
+        this.lock = new Object();
+
+        this.register();
+    }
+
+    /**
      * Checks if the leaf has registered with the central processing server.
      * 
      * @return  true    If the leaf has established a connection with the central
@@ -86,20 +98,6 @@ public class Leaf extends Transport {
 
         return super.receive();
     }
-
-    /**
-     * Create a Leaf with a provided identity.
-     * 
-     * @param identity The identity of this leaf (Android user or Plant endpoint)
-     */
-    public Leaf(Identity identity) throws SocketException {
-        super(new Random().nextInt(0xFFFF));
-        this.identity = identity;
-        this.lock = new Object();
-
-        this.register();
-    }
-
 
     /*
      * Join the lock wait set if registration has still not completed. 
