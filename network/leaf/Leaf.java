@@ -16,15 +16,17 @@ import network.core.packets.RegistrationResponse;
  * for the SmartGrow system.
  * 
  * A leaf could be:
- * - A plant endpoint
- *      A node which provides sensory information on a plant
- * - An android user
- *      An application that interacts with the SmartGrow system
+ * <p>
+ * -    A plant endpoint: a node which provides sensory information on a plant
+ * </p>
+ * <p>
+ * -    An android user: a mobile application that interacts with the SmartGrow system 
  *      by providing input and receiving sensory information.
+ * </p>
  * 
- * Using this logical grouping, the Leaf abstraction completely
- * abstracts the UDP networking logic by automatically registering
- * with the central processing server and communicating with its
+ * Using this logical grouping, the Leaf entirely abstracts the
+ * UDP networking logic by automatically registering with the
+ * central processing server (CPS) and communicating with its
  * assigned branch.
  * 
  * @author Ahmed Sakr
