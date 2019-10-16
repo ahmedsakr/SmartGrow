@@ -7,7 +7,10 @@ import java.util.Arrays;
 import java.util.zip.CRC32;
 
 import network.core.packets.LeafRegistration;
-import network.core.CorruptPacketException;
+import network.core.packets.RegistrationResponse;
+import network.core.exceptions.CRCVerificationException;
+import network.core.exceptions.CorruptPacketException;
+import network.core.exceptions.OpCodeNotRecognizedException;
 
 /**
  * Payloads are expected to follow the form of well-known packets
@@ -88,16 +91,19 @@ public abstract class Packet {
 
         Packet pkt = null;
         switch (payload[0]) {
-            case PacketCodes.LEAF_REGISTRATION:
+            case OpCodes.LEAF_REGISTRATION:
                 pkt = new LeafRegistration();
                 break;
+            case OpCodes.REGISTRATION_RESPONSE:
+                pkt = new RegistrationResponse();
+                break;
             default:
-                throw new CorruptPacketException("Packet OpCode is not recognized");
+                throw new OpCodeNotRecognizedException("Packet OpCode is not recognized");
         }
 
         // Verify the integrity of the packet using the CRC32 checksum
         if (!pkt.verifyPacket(payload)) {
-            throw new CorruptPacketException("CRC check failed");
+            throw new CRCVerificationException("CRC check failed");
         }
 
         pkt.extract(payload);

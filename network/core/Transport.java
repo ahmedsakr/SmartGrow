@@ -6,6 +6,8 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import network.core.exceptions.CorruptPacketException;
+
 /**
  * Transport is developed to abstract UDP intricacies away
  * from the workflow. Using Transport, All ends in the 
@@ -19,6 +21,19 @@ public class Transport {
 
     private DatagramSocket socket;
 
+    /**
+     * Allows the caller to allow the DatagramSocket implementation to choose
+     * a random port.
+     */
+    public Transport() throws SocketException {
+        this.socket = new DatagramSocket();
+    }
+
+    /**
+     * Allows the caller to specify what port they want to listen on.
+     * 
+     * @param port The port desired to listen on.
+     */
     public Transport(int port) throws SocketException {
         this.socket = new DatagramSocket(port);
     }
