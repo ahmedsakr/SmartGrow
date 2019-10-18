@@ -20,13 +20,15 @@ import network.core.exceptions.CorruptPacketException;
 public class Transport {
 
     private DatagramSocket socket;
+    private NodeLocation destination;
 
     /**
      * Allows the caller to allow the DatagramSocket implementation to choose
      * a random port.
      */
-    public Transport() throws SocketException {
+    public Transport(NodeLocation destination) throws SocketException {
         this.socket = new DatagramSocket();
+        this.setDestination(destination);
     }
 
     /**
@@ -34,8 +36,18 @@ public class Transport {
      * 
      * @param port The port desired to listen on.
      */
-    public Transport(int port) throws SocketException {
+    public Transport(NodeLocation destination, int port) throws SocketException {
         this.socket = new DatagramSocket(port);
+        this.setDestination(destination);
+    }
+
+    /**
+     * Assign the destination address of this transport instance.
+     * 
+     * @param location The IPv4 location of the destination node.
+     */
+    public void setDestination(NodeLocation location) {
+        this.destination = destination;
     }
 
     /**
@@ -48,6 +60,9 @@ public class Transport {
         // Finalize the packet payload.
         packet.compile();
 
+        // Override the destination of the packet based on the transport destination
+        packet.setDestination(this.destination.getIpAddress(), this.destination.getPort());
+        
         // Dispatch the packet.
         this.socket.send(packet.getDatagram());
     }
