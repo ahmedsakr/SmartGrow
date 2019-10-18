@@ -35,9 +35,10 @@ public class Branch extends Transport {
 
     /**
      * Send a message to all leaves on this branch.
+     * 
+     * @param packet The packet to broadcast to all leaves
      */
     public void broadcast(Packet packet) {
-
+        this.servicers.forEach((servicer) -> servicer.forwardBroadcast(packet));
     }
-
 }

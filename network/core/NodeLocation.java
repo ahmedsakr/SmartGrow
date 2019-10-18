@@ -24,6 +24,7 @@ public class NodeLocation {
      */
     public NodeLocation(String ipAddress, int port) {
         this.ipAddress = ipAddress;
+        this.port = port;
     }
 
     /**

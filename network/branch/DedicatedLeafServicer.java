@@ -16,6 +16,7 @@ import network.core.packets.RegistrationResponse;
  */
 public class DedicatedLeafServicer extends Transport implements Runnable {
 
+    // The thread that this instance runs in.
     private Thread serviceThread;
 
     /**
@@ -28,7 +29,15 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
 
         // Start the servicer once initialization is complete
         this.serviceThread = new Thread(this).start();
+    }
 
+    /**
+     * Forward the broadcast message to the destination.
+     * 
+     * @param broadcast The broadcast payload message
+     */
+    public void forwardBroadcast(Packet broadcast) {
+        this.send(p);
     }
 
     /**
@@ -40,6 +49,7 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
         // Inform the leaf that they have been registered
         RegistrationResponse response = new RegistrationResponse();
         response.setStatus(true);
+        
         this.send(response);
         
         // Begin the receive-respond loop of the servicer.

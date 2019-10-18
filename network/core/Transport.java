@@ -47,7 +47,16 @@ public class Transport {
      * @param location The IPv4 location of the destination node.
      */
     public void setDestination(NodeLocation location) {
-        this.destination = destination;
+        this.destination = location;
+    }
+
+    /**
+     * Retrieve the location of the destination node.
+     * 
+     * @return The IPv4 representation of the destination address
+     */
+    public NodeLocation getDestination() {
+        return this.destination;
     }
 
     /**

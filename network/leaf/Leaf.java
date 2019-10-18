@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.SocketException;
 
 import network.Configuration;
+import network.core.NodeLocation;
 import network.core.Packet;
 import network.core.Transport;
 import network.core.exceptions.CorruptPacketException;
@@ -50,7 +51,7 @@ public class Leaf extends Transport {
      * @param identity The identity of this leaf (Android user or Plant endpoint)
      */
     public Leaf(Identity identity) throws SocketException {
-        super();
+        super(new NodeLocation(Configuration.CPS_ADDRESS, Configuration.CPS_PORT));
         this.identity = identity;
         this.lock = new Object();
 
@@ -126,7 +127,6 @@ public class Leaf extends Transport {
             try {
                 LeafRegistration registration = new LeafRegistration();
                 registration.setIdentity(this.identity);
-                registration.setDestination(Configuration.CPS_ADDRESS, Configuration.CPS_PORT);
 
                 synchronized (this.lock) {
                     super.send(registration);
