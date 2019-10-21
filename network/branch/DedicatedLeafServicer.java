@@ -1,10 +1,13 @@
 package network.branch;
 
+import java.io.IOException;
 import java.lang.Runnable;
+import java.net.SocketException;
 
 import network.core.NodeLocation;
 import network.core.Packet;
 import network.core.Transport;
+import network.core.exceptions.CorruptPacketException;
 import network.core.packets.RegistrationResponse;
 
 /**
@@ -24,11 +27,12 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
      * 
      * @param leafAddress The IPv4 address (and port) of the leaf
      */
-    public DedicatedLeafServicer(NodeLocation leafAddress) {
+    public DedicatedLeafServicer(NodeLocation leafAddress) throws SocketException {
         super(leafAddress);
 
         // Start the servicer once initialization is complete
-        this.serviceThread = new Thread(this).start();
+        this.serviceThread = new Thread(this);
+        this.serviceThread.start();
     }
 
     /**
@@ -36,8 +40,8 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
      * 
      * @param broadcast The broadcast payload message
      */
-    public void forwardBroadcast(Packet broadcast) {
-        this.send(p);
+    public void forwardBroadcast(Packet broadcast) throws IOException {
+        this.send(broadcast);
     }
 
     /**
@@ -50,17 +54,21 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
         RegistrationResponse response = new RegistrationResponse();
         response.setStatus(true);
         
-        this.send(response);
-        
-        // Begin the receive-respond loop of the servicer.
-        //
-        // For now, all it does is receive but it will not respond.
-        // Once we have the implementation of the rest of the system,
-        // this hsould be changed to fulfill leaf requests
-        while (true) {
-            Packet request = this.receive();
+        try {
+            this.send(response);
+            
+            // Begin the receive-respond loop of the servicer.
+            //
+            // For now, all it does is receive but it will not respond.
+            // Once we have the implementation of the rest of the system,
+            // this hsould be changed to fulfill leaf requests
+            while (true) {
+                Packet request = this.receive();
+            }
+        } catch (CorruptPacketException | IOException ex) {
+            System.err.printf("CRITICAL: failed network i/o when servicing leaf port #d\n",
+                this.getDestination().getPort());
         }
-        
     }
 
 }

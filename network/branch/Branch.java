@@ -1,6 +1,11 @@
 package network.branch;
 
+import network.core.Transport;
+import network.core.Packet;
+
+import java.io.IOException;
 import java.net.DatagramSocket;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 import network.core.NodeLocation;
@@ -12,7 +17,7 @@ import network.core.NodeLocation;
  * @since October 16, 2019
  * @author Ahmed Sakr
  */
-public class Branch extends Transport {
+public class Branch {
 
     // The list of live nodes connected to this stem.
     private ArrayList<DedicatedLeafServicer> servicers;
@@ -29,7 +34,7 @@ public class Branch extends Transport {
      * 
      * @param location The IPv4 address of the leaf
      */
-    public void addLeaf(NodeLocation location) {
+    public void addLeaf(NodeLocation location) throws SocketException {
         this.servicers.add(new DedicatedLeafServicer(location));
     }
 
@@ -38,7 +43,9 @@ public class Branch extends Transport {
      * 
      * @param packet The packet to broadcast to all leaves
      */
-    public void broadcast(Packet packet) {
-        this.servicers.forEach((servicer) -> servicer.forwardBroadcast(packet));
+    public void broadcast(Packet packet) throws IOException {
+        for (DedicatedLeafServicer servicer : this.servicers) {
+            servicer.forwardBroadcast(packet);
+        }
     }
 }
