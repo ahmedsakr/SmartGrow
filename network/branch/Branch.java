@@ -35,8 +35,19 @@ public class Branch {
         this.servicers.add(new DedicatedLeafServicer(location));
     }
 
+    /**
+     * Removes an existing servicer for the leaf speicified by the location.
+     * 
+     * @param location The IPv4 address of the leaf
+     */
     public void removeLeaf(NodeLocation location) {
-        this.servicers.removeIf((servicer) -> servicer.getDestination().equals(location));
+        for (DedicatedLeafServicer servicer : this.servicers) {
+            if (servicer.getDestination().equals(location)) {
+                servicer.stop();
+                this.servicers.remove(servicer);
+                break;
+            }
+        }
     }
 
     /**

@@ -45,6 +45,20 @@ public class Leaf extends Transport {
     private String branchAddress;
     private int branchPort;
 
+
+    /**
+     * Create a Leaf with a provided identity.
+     * 
+     * @param identity The identity of this leaf (Android user or Plant endpoint)
+     */
+    public Leaf(Identity identity, int port) throws SocketException {
+        super(new NodeLocation(Configuration.CPS_ADDRESS, Configuration.CPS_PORT), port);
+        this.identity = identity;
+        this.lock = new Object();
+
+        this.register();
+    }
+
     /**
      * Create a Leaf with a provided identity.
      * 

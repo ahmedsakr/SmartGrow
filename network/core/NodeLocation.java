@@ -44,6 +44,15 @@ public class NodeLocation {
     }
 
     /**
+     * Override the default string representation of this object.
+     * 
+     * @return A string including the Ip address and port of this object.
+     */
+    public String toString() {
+        return String.format("Leaf(\"%s\", %d)", this.ipAddress, this.port);
+    }
+
+    /**
      * Override the default equals method to compare the port and IP address.
      * 
      * @param object The other NodeLocation object that is being compared to.

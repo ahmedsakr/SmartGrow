@@ -8,6 +8,7 @@ import network.core.NodeLocation;
 import network.core.Packet;
 import network.core.Transport;
 import network.core.exceptions.CorruptPacketException;
+import network.core.exceptions.TransportInterruptedException;
 import network.core.packets.RegistrationResponse;
 
 /**
@@ -45,6 +46,14 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
     }
 
     /**
+     * Stop the leaf servicer by interrupting it, causing it to terminate.
+     */
+    public void stop() {
+        this.serviceThread.interrupt();
+        this.close();
+    }
+
+    /**
      * The entry point of the thread.
      */
     @Override
@@ -65,9 +74,12 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
             while (true) {
                 Packet request = this.receive();
             }
-        } catch (CorruptPacketException | IOException ex) {
-            System.err.printf("CRITICAL: failed network i/o when servicing leaf port #d\n",
-                this.getDestination().getPort());
+        } catch (TransportInterruptedException ex) {
+            System.out.printf("Ending servicer for %s\n", this.getDestination());
+        } catch (CorruptPacketException ex) {
+            System.err.printf("Received payload is invalid: %s\n", ex);
+        } catch (IOException ex) {
+            System.err.printf("CRITICAL: failed network i/o when servicing %s\n", this.getDestination());
         }
     }
 
