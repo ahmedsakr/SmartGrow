@@ -59,7 +59,6 @@ public class SensorsData extends Packet {
     @Override
     protected void extract(byte[] payload) {
         for (int i = 1; payload[i] != 0; i += 5) {
-            System.out.printf("lmao: %d", payload[i]);
             this.data.put(payload[i], this.convertBytesToInt(Arrays.copyOfRange(payload, i + 1, i + 5)));
         }
     }
