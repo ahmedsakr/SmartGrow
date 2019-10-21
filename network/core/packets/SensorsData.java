@@ -73,10 +73,8 @@ public class SensorsData extends Packet {
     @Override
     protected void build() {
         for (Byte sensorId : this.data.keySet()) {
-            System.out.println(sensorId);
             super.addByte(sensorId);
             super.addInt(this.data.get(sensorId));
-            System.out.println(this.data.get(sensorId));
         }
     }
 }
