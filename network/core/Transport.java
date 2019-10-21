@@ -7,6 +7,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 
 import network.core.exceptions.CorruptPacketException;
+import network.core.exceptions.TransportInterruptedException;
 
 /**
  * Transport is developed to abstract UDP intricacies away
@@ -20,13 +21,15 @@ import network.core.exceptions.CorruptPacketException;
 public class Transport {
 
     private DatagramSocket socket;
+    private NodeLocation destination;
 
     /**
      * Allows the caller to allow the DatagramSocket implementation to choose
      * a random port.
      */
-    public Transport() throws SocketException {
+    public Transport(NodeLocation destination) throws SocketException {
         this.socket = new DatagramSocket();
+        this.setDestination(destination);
     }
 
     /**
@@ -34,8 +37,27 @@ public class Transport {
      * 
      * @param port The port desired to listen on.
      */
-    public Transport(int port) throws SocketException {
+    public Transport(NodeLocation destination, int port) throws SocketException {
         this.socket = new DatagramSocket(port);
+        this.setDestination(destination);
+    }
+
+    /**
+     * Assign the destination address of this transport instance.
+     * 
+     * @param location The IPv4 location of the destination node.
+     */
+    public void setDestination(NodeLocation location) {
+        this.destination = location;
+    }
+
+    /**
+     * Retrieve the location of the destination node.
+     * 
+     * @return The IPv4 representation of the destination address
+     */
+    public NodeLocation getDestination() {
+        return this.destination;
     }
 
     /**
@@ -43,13 +65,20 @@ public class Transport {
      * @param packet
      * @throws IOException
      */
-    public void send(Packet packet) throws IOException {
+    public void send(Packet packet) throws TransportInterruptedException, IOException {
         
         // Finalize the packet payload.
         packet.compile();
 
+        // Override the destination of the packet based on the transport destination
+        packet.setDestination(this.destination.getIpAddress(), this.destination.getPort());
+
         // Dispatch the packet.
-        this.socket.send(packet.getDatagram());
+        try {
+            this.socket.send(packet.getDatagram());
+        } catch (SocketException ex) {
+            throw new TransportInterruptedException("Transport thread interrupted");
+        }
     }
 
     /**
@@ -61,13 +90,19 @@ public class Transport {
      * 
      * @see network.core.Packet
      */
-    public Packet receive() throws CorruptPacketException, IOException {
+    public Packet receive() throws CorruptPacketException, TransportInterruptedException, IOException {
 
         byte[] payload = new byte[Packet.PACKET_SIZE];
         DatagramPacket udpPacket = new DatagramPacket(payload, payload.length);
 
-        // Receive and transform the UDP payload into a Packet object.
-        this.socket.receive(udpPacket);
+        // Receive the payload on this socket.
+        try {
+            this.socket.receive(udpPacket);
+        } catch (SocketException ex) {
+            throw new TransportInterruptedException("Transport thread interrupted");
+        }
+
+        // Transform the UDP payload into a Packet object.
         Packet packet = Packet.fromPayload(payload);
 
         try {
@@ -81,5 +116,12 @@ public class Transport {
         }
 
         return packet;
+    }
+
+    /**
+     * Close the DatagramSocket, disallowing it from receiving or sending more messages.
+     */
+    public void close() {
+        this.socket.close();
     }
 }
