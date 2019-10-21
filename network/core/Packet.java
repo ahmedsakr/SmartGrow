@@ -8,6 +8,7 @@ import java.util.zip.CRC32;
 
 import network.core.packets.LeafRegistration;
 import network.core.packets.RegistrationResponse;
+import network.core.packets.SensorsData;
 import network.core.exceptions.CRCVerificationException;
 import network.core.exceptions.CorruptPacketException;
 import network.core.exceptions.OpCodeNotRecognizedException;
@@ -96,6 +97,9 @@ public abstract class Packet {
                 break;
             case OpCodes.REGISTRATION_RESPONSE:
                 pkt = new RegistrationResponse();
+                break;
+            case OpCodes.SENSORS_DATA:
+                pkt = new SensorsData();
                 break;
             default:
                 throw new OpCodeNotRecognizedException("Packet OpCode is not recognized");
@@ -246,6 +250,25 @@ public abstract class Packet {
     }
 
     /**
+     * Converts the integer to a Big-Endian byte array.
+     */
+    protected byte[] convertIntToBytes(int value) {
+        return new byte[] {
+            (byte)((value >> 24)), (byte)((value >> 16)), (byte)((value >> 8)), (byte)(value)
+        };
+    }
+
+    /**
+     * Converts a Big-Endian byte array to its integer representation.
+     */
+    protected int convertBytesToInt(byte[] array) {
+        return  (int)((array[0] << 24) & 0xFF000000) +
+                (int)((array[1] << 16) & 0x00FF0000) +
+                (int)((array[2] << 8) & 0x0000FF00) +
+                (int)(array[3] & 0xFF);
+    }
+
+    /**
      * Computes the checksum for the whole payload including the padding.
      *
      * @return
@@ -266,24 +289,5 @@ public abstract class Packet {
             this.data[i++] = 0;
             this.size++;
         }
-    }
-
-    /**
-     * Converts the integer to a Big-Endian byte array.
-     */
-    private byte[] convertIntToBytes(int value) {
-        return new byte[] {
-            (byte)((value >> 24)), (byte)((value >> 16)), (byte)((value >> 8)), (byte)(value)
-        };
-    }
-
-    /**
-     * Converts a Big-Endian byte array to its integer representation.
-     */
-    private int convertBytesToInt(byte[] array) {
-        return  (int)((array[0] << 24) & 0xFF000000) +
-                (int)((array[1] << 16) & 0x00FF0000) +
-                (int)((array[2] << 8) & 0x0000FF00) +
-                (int)(array[3] & 0xFF);
     }
 }
