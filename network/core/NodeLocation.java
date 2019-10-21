@@ -1,7 +1,5 @@
 package network.core;
 
-import java.net.InetAddress;
-
 /**
  * NodeLocation stores the location of a node within the
  * SmartGrow network, importantly its IPv4 address and its
@@ -43,6 +41,24 @@ public class NodeLocation {
      */
     public int getPort() {
         return this.port;
+    }
+
+    /**
+     * Override the default equals method to compare the port and IP address.
+     * 
+     * @param object The other NodeLocation object that is being compared to.
+     *
+     * @return      true    If both instances have the same port and Ip address
+     *              false   Otherwise
+     */
+    @Override
+    public boolean equals(Object object) {
+        if (object == null || !(object instanceof NodeLocation)) {
+            return false;
+        }
+
+        NodeLocation location = (NodeLocation) object;
+        return this.getPort() == location.getPort() && this.getIpAddress().equals(this.ipAddress);
     }
 
 }

@@ -1,14 +1,11 @@
 package network.branch;
 
-import network.core.Transport;
 import network.core.Packet;
+import network.core.NodeLocation;
 
 import java.io.IOException;
-import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
-
-import network.core.NodeLocation;
 
 /**
  * Branch allows for a logical grouping of one or more
@@ -36,6 +33,10 @@ public class Branch {
      */
     public void addLeaf(NodeLocation location) throws SocketException {
         this.servicers.add(new DedicatedLeafServicer(location));
+    }
+
+    public void removeLeaf(NodeLocation location) {
+        this.servicers.removeIf((servicer) -> servicer.getDestination().equals(location));
     }
 
     /**
