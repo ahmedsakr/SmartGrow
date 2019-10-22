@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.lang.Runnable;
 import java.net.SocketException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import network.core.NodeLocation;
 import network.core.Packet;
 import network.core.Transport;
@@ -20,6 +23,8 @@ import network.core.packets.RegistrationResponse;
  */
 public class DedicatedLeafServicer extends Transport implements Runnable {
 
+    private static Logger logger = LogManager.getLogger(DedicatedLeafServicer.class);
+
     // The thread that this instance runs in.
     private Thread serviceThread;
     private boolean ready;
@@ -33,7 +38,7 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
         super(leafAddress);
 
         // Start the servicer once initialization is complete
-        this.serviceThread = new Thread(this);
+        this.serviceThread = new Thread(this, "LeafServicer-" + leafAddress.getPort());
         this.serviceThread.start();
     }
 
@@ -48,9 +53,10 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
         // to respond to the leaf with a RegistrationResponse.
         while (!this.ready) {
             try {
+                logger.debug("Waiting for " + this.serviceThread.getName() + " to be ready");
                 this.wait();
             } catch (InterruptedException ex) {
-                System.err.println("CRITICAL: Interrupted while waiting for servicer to get ready.");
+                logger.error("CRITICAL: Interrupted while waiting for servicer to get ready.");
                 return;
             }
         }
@@ -78,6 +84,7 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
         
         try {
             this.send(response);
+            logger.debug("Sent successful RegistrationRequest packet to leaf");
             
             // Set the state of this servicer to ready now that we have forwarded the
             // registration response to the client.
@@ -93,13 +100,14 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
             // this hsould be changed to fulfill leaf requests
             while (true) {
                 Packet request = this.receive();
+                logger.info("received packet from leaf: " + request);
             }
         } catch (TransportInterruptedException ex) {
-            System.out.printf("Ending servicer for %s\n", this.getDestination());
+            logger.info("Ending servicer for " + this.getDestination());
         } catch (CorruptPacketException ex) {
-            System.err.printf("Received payload is invalid: %s\n", ex);
+            logger.error("Received payload is invalid: " + ex);
         } catch (IOException ex) {
-            System.err.printf("CRITICAL: failed network i/o when servicing %s\n", this.getDestination());
+            logger.error("CRITICAL: failed network i/o when servicing " + this.getDestination());
         }
     }
 

@@ -6,6 +6,9 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import network.core.exceptions.CorruptPacketException;
 import network.core.exceptions.TransportInterruptedException;
 
@@ -20,6 +23,8 @@ import network.core.exceptions.TransportInterruptedException;
  */
 public class Transport {
 
+    private static Logger logger = LogManager.getLogger(Transport.class);
+
     private DatagramSocket socket;
     private NodeLocation destination;
 
@@ -30,6 +35,8 @@ public class Transport {
     public Transport(NodeLocation destination) throws SocketException {
         this.socket = new DatagramSocket();
         this.setDestination(destination);
+
+        logger.debug("Initialized on port #" + this.socket.getLocalPort());
     }
 
     /**
@@ -40,6 +47,17 @@ public class Transport {
     public Transport(NodeLocation destination, int port) throws SocketException {
         this.socket = new DatagramSocket(port);
         this.setDestination(destination);
+
+        logger.debug("Initialized on port #" + this.socket.getLocalPort());
+    }
+
+    /**
+     * Retrieve the local port that this transport is listening on.
+     * 
+     * @return The 16-bit port number being listened on.
+     */
+    public int getPort() {
+        return this.socket.getLocalPort();
     }
 
     /**
@@ -111,7 +129,7 @@ public class Transport {
 
             // This happening means there is a failure in the physical network.
             // We must terminate.
-            System.err.println("CRITICAL: Unable to resolve hostname: " + ex);
+            logger.fatal("CRITICAL: Unable to resolve hostname: " + ex);
             System.exit(1);
         }
 
