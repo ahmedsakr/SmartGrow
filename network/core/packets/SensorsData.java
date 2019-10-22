@@ -43,7 +43,7 @@ public class SensorsData extends Packet {
      * 
      * @return The sensor data
      */
-    public Double getSensorData(byte sensorId) {
+    public double getSensorData(byte sensorId) {
         return this.data.get(sensorId);
     }
 
