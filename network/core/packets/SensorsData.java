@@ -58,9 +58,13 @@ public class SensorsData extends Packet {
      */
     @Override
     protected void extract(byte[] payload) {
-        for (int i = 1; payload[i] != 0; i += 1 + Double.BYTES) {
+
+        // A sensor data block consists of the sensor id (1 byte) and sensor value (8 bytes)
+        int sensorDataLength = 1 + Double.BYTES;
+
+        for (int i = 1; payload[i] != 0; i += sensorDataLength) {
             this.data.put(payload[i],
-                this.convertBytesToDouble(Arrays.copyOfRange(payload, i + 1, i + 1 + Double.BYTES)));
+                this.convertBytesToDouble(Arrays.copyOfRange(payload, i + 1, i + sensorDataLength)));
         }
     }
 
