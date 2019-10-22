@@ -3,6 +3,7 @@ package network.core;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.zip.CRC32;
 
@@ -203,6 +204,23 @@ public abstract class Packet {
     }
 
     /**
+     * Appends a double to the packet.
+     * 
+     * @param value The double value to be stored in the packet
+     */
+    protected void addDouble(double value) {
+        if (this.getFreeSpace() - Double.BYTES < 0) {
+            return;
+        }
+
+        byte[] doubleArray = new byte[Double.BYTES];
+        ByteBuffer.wrap(doubleArray).putDouble(value);
+
+        System.arraycopy(doubleArray, 0, this.data, this.size, Double.BYTES);
+        this.size += Double.BYTES;
+    }
+
+    /**
      * Appends an integer to the packet.
      * 
      * @param value The integer value to be stored in the packet
@@ -251,6 +269,8 @@ public abstract class Packet {
 
     /**
      * Converts the integer to a Big-Endian byte array.
+     * 
+     * @param value The integer representation of the value
      */
     protected byte[] convertIntToBytes(int value) {
         return new byte[] {
@@ -260,12 +280,23 @@ public abstract class Packet {
 
     /**
      * Converts a Big-Endian byte array to its integer representation.
+     * 
+     * @param array The 4-byte array containing the value of the integer
      */
     protected int convertBytesToInt(byte[] array) {
         return  (int)((array[0] << 24) & 0xFF000000) +
                 (int)((array[1] << 16) & 0x00FF0000) +
                 (int)((array[2] << 8) & 0x0000FF00) +
                 (int)(array[3] & 0xFF);
+    }
+
+    /**
+     * Converts the byte array into a double value.
+     * 
+     * @param array The 8-byte array containing the value of the double
+     */
+    protected double convertBytesToDouble(byte[] array) {
+        return ByteBuffer.wrap(array).getDouble();
     }
 
     /**

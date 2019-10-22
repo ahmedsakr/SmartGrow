@@ -16,7 +16,7 @@ import network.core.Packet;
  */
 public class SensorsData extends Packet {
 
-    private HashMap<Byte, Integer> data;
+    private HashMap<Byte, Double> data;
 
     /**
      * Initialize a new SensorsData packet object.
@@ -32,7 +32,7 @@ public class SensorsData extends Packet {
      * @param sensorId The well-known id of the sensor
      * @param sensorData The data of that sensor.
      */
-    public void addSensorData(byte sensorId, int sensorData) {
+    public void addSensorData(byte sensorId, double sensorData) {
         this.data.put(sensorId, sensorData);
     }
 
@@ -43,7 +43,7 @@ public class SensorsData extends Packet {
      * 
      * @return The sensor data
      */
-    public Integer getSensorData(byte sensorId) {
+    public Double getSensorData(byte sensorId) {
         return this.data.get(sensorId);
     }
 
@@ -58,8 +58,8 @@ public class SensorsData extends Packet {
      */
     @Override
     protected void extract(byte[] payload) {
-        for (int i = 1; payload[i] != 0; i += 5) {
-            this.data.put(payload[i], this.convertBytesToInt(Arrays.copyOfRange(payload, i + 1, i + 5)));
+        for (int i = 1; payload[i] != 0; i += 9) {
+            this.data.put(payload[i], this.convertBytesToDouble(Arrays.copyOfRange(payload, i + 1, i + 9)));
         }
     }
 
@@ -73,7 +73,7 @@ public class SensorsData extends Packet {
     protected void build() {
         for (Byte sensorId : this.data.keySet()) {
             super.addByte(sensorId);
-            super.addInt(this.data.get(sensorId));
+            super.addDouble(this.data.get(sensorId));
         }
     }
 }
