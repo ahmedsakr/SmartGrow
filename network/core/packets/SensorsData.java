@@ -48,11 +48,11 @@ public class SensorsData extends Packet {
     }
 
     /**
-     * Retrieves all information for this RegistrationResponse packet by reading the
+     * Retrieves all information for this SensorsData packet by reading the
      * provided payload.
      * 
      * This method is invoked by Packet::fromPayload when the caller wishes to
-     * create an instance of RegistrationResponse through a given payload.
+     * create an instance of SensorsData through a given payload.
      * 
      * @param payload A prepopulated 512-byte payload used to get information from
      */
