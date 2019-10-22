@@ -59,13 +59,15 @@ public class Stem extends Transport {
 
         new Thread(() -> {
             try {
-                LeafRegistration packet = (LeafRegistration) this.receive();
-                logger.info("New client from " + packet.getAddress() + ":" + packet.getPort());
+                while (true) {
+                    LeafRegistration packet = (LeafRegistration) this.receive();
+                    logger.info("New client from " + packet.getAddress() + ":" + packet.getPort());
 
-                if (packet.getIdentity() == Identity.ANDROID_USER) {
-                    this.users.addLeaf(new NodeLocation(packet.getAddress(), packet.getPort()));
-                } else {
-                    this.plants.addLeaf(new NodeLocation(packet.getAddress(), packet.getPort()));
+                    if (packet.getIdentity() == Identity.ANDROID_USER) {
+                        this.users.addLeaf(new NodeLocation(packet.getAddress(), packet.getPort()));
+                    } else {
+                        this.plants.addLeaf(new NodeLocation(packet.getAddress(), packet.getPort()));
+                    }
                 }
             } catch (CorruptPacketException ex) {
                 logger.error("Received corrupt packet");
