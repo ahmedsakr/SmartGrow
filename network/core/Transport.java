@@ -29,14 +29,28 @@ public class Transport {
     private NodeLocation destination;
 
     /**
-     * Allows the caller to allow the DatagramSocket implementation to choose
+     * 
+     * @param port
+     * @throws SocketException
+     */
+    public Transport(int port) throws SocketException {
+        this.socket = new DatagramSocket(port);
+
+        logger.debug("Initialized on port #" + port);
+    }
+
+    /**
+     * Allows the caller to leave the DatagramSocket implementation to choose
      * a random port.
+     * 
+     * @param destination The fixed destination that is being
      */
     public Transport(NodeLocation destination) throws SocketException {
         this.socket = new DatagramSocket();
         this.setDestination(destination);
 
         logger.debug("Initialized on port #" + this.socket.getLocalPort());
+        
     }
 
     /**
@@ -48,7 +62,7 @@ public class Transport {
         this.socket = new DatagramSocket(port);
         this.setDestination(destination);
 
-        logger.debug("Initialized on port #" + this.socket.getLocalPort());
+        logger.debug("Initialized on port #" + port);
     }
 
     /**
@@ -88,8 +102,11 @@ public class Transport {
         // Finalize the packet payload.
         packet.compile();
 
-        // Override the destination of the packet based on the transport destination
-        packet.setDestination(this.destination.getIpAddress(), this.destination.getPort());
+        if (this.destination != null) {
+            
+            // Override the destination of the packet based on the transport destination
+            packet.setDestination(this.destination.getIpAddress(), this.destination.getPort());
+        }
 
         // Dispatch the packet.
         try {
