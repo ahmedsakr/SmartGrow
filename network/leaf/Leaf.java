@@ -3,6 +3,9 @@ package network.leaf;
 import java.io.IOException;
 import java.net.SocketException;
 
+import org.apache.logging.log4j.LogManager;;
+import org.apache.logging.log4j.Logger;
+
 import network.Configuration;
 import network.core.NodeLocation;
 import network.core.Packet;
@@ -34,6 +37,8 @@ import network.core.packets.RegistrationResponse;
  */
 public class Leaf extends Transport {
 
+    private static Logger logger = LogManager.getLogger(Leaf.class);
+
     // Synchronizing access to the socket and state variables
     private Object lock;
 
@@ -53,9 +58,9 @@ public class Leaf extends Transport {
      */
     public Leaf(Identity identity, int port) throws SocketException {
         super(new NodeLocation(Configuration.CPS_ADDRESS, Configuration.CPS_PORT), port);
+        
         this.identity = identity;
         this.lock = new Object();
-
         this.register();
     }
 
@@ -66,9 +71,9 @@ public class Leaf extends Transport {
      */
     public Leaf(Identity identity) throws SocketException {
         super(new NodeLocation(Configuration.CPS_ADDRESS, Configuration.CPS_PORT));
+
         this.identity = identity;
         this.lock = new Object();
-
         this.register();
     }
 
@@ -127,7 +132,7 @@ public class Leaf extends Transport {
                     // TODO: Check if registration failed?
                     this.lock.wait();
                 } catch (InterruptedException ex) {
-                    System.err.println("CRITICAL: interrupted while waiting for leaf registration");
+                    logger.error("CRITICAL: interrupted while waiting for leaf registration");
                 }
             }
         }
@@ -143,14 +148,21 @@ public class Leaf extends Transport {
                 registration.setIdentity(this.identity);
 
                 synchronized (this.lock) {
+                    
+                    // Request Registration by sending the LeafRegistration packet
+                    logger.info("Sending LeafRegistration packet");
                     super.send(registration);
+
                     RegistrationResponse response = (RegistrationResponse) super.receive();
 
                     this.registered = response.isRegistered();
                     if (!response.isRegistered()) {
-                        
+                        logger.error("Failed to register with the central processing server");
+
                         // TODO: how to recover from a failure to register with the server?
                     }
+
+                    logger.info("Successfully registered with central processing server");
                     
                     this.branchAddress = response.getAddress();
                     this.branchPort = response.getPort();
@@ -158,8 +170,8 @@ public class Leaf extends Transport {
                 }
 
             } catch (IOException | CorruptPacketException ex) {
-                System.err.printf("CRITICAL: failed to register with CPS: %s\n", ex);
+                logger.error("CRITICAL: failed to register with CPS: " + ex);
             }
-        }).start();
+        }, String.format("LeafRegistration-%d", this.getPort())).start();
     }
 }
