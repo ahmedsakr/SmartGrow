@@ -50,7 +50,6 @@ public class Transport {
         this.setDestination(destination);
 
         logger.debug("Initialized on port #" + this.socket.getLocalPort());
-        
     }
 
     /**
