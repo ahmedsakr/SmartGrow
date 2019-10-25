@@ -33,6 +33,7 @@ public class CentralProcessingServer {
     public static void main(String[] args) {
         try {
             CentralProcessingServer server = new CentralProcessingServer(Configuration.CPS_PORT);
+            logger.info("Successfully initialized cps on port " + Configuration.CPS_PORT);
         } catch (SocketException ex) {
             logger.fatal("Unable to initialize cps on port " + Configuration.CPS_PORT);
         }
