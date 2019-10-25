@@ -36,6 +36,7 @@ public class CentralProcessingServer {
             logger.info("Successfully initialized cps on port " + Configuration.CPS_PORT);
         } catch (SocketException ex) {
             logger.fatal("Unable to initialize cps on port " + Configuration.CPS_PORT);
+            System.exit(1);
         }
     }
 }
