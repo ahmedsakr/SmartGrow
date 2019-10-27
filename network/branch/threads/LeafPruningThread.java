@@ -63,7 +63,6 @@ public class LeafPruningThread extends Thread {
                             .filter((servicer) -> currentTime - servicer.getLastReceivedTime() >= LEAF_PRUNING_THRESHOLD)
                             .collect(Collectors.toList());
 
-
                     for (DedicatedLeafServicer servicer : deadLeaves) {
                         logger.info("Stopping servicer for " + servicer.getDestination());
 
