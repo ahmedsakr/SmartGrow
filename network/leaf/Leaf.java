@@ -100,6 +100,12 @@ public class Leaf extends Transport {
     public void send(Packet packet) throws IOException {
         this.waitForRegistration();
 
+        // Return null if the leaf failed to register.
+        if (!this.registered) {
+            logger.warn("Unable to send packet because leaf is not registered with the cps");
+            return;
+        }
+
         // Override the destination address and port to the branch assigned to this leaf.
         packet.setDestination(this.branchAddress, this.branchPort);
 
@@ -118,6 +124,7 @@ public class Leaf extends Transport {
         
         // Return null if the leaf failed to register.
         if (!this.registered) {
+            logger.warn("Unable to receive packet because leaf is not registered with the cps");
             return null;
         }
 
