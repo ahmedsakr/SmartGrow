@@ -1,0 +1,15 @@
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">SmartGrow2.0</string>
+    <string name="light_intensity">Light Intensity</string>
+    <string name="soil_moisture">Soil Moisture</string>
+    <string name="air_temperature">Air Temperature</string>
+    <string name="air_humidity">Air Humidity</string>
+    <!--
+    %f is the placeholder for a float/double.
+    1$ is the first argument after the resource reference ie R.string.string_name
+    -->
+    <string name="lightIntensity">Current Reading: %1$f</string>
+    <string name="soilMoisture">Current Reading: %1$f</string>
+    <string name="airTemperature">Current Reading: %1$f</string>
+    <string name="airHumidity">Current Reading: %1$f</string>
+</resources>
