@@ -6,6 +6,8 @@ import network.core.NodeLocation;
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,6 +31,40 @@ public class Branch {
      */
     public Branch() {
         this.servicers = new ArrayList<>();
+    }
+
+    /**
+     * Check if the provided leaf is being serviced by any of the existing servicers.
+     * 
+     * @param leaf The IPv4 address and port of the leaf
+     * @return      true    If the leaf has an existing servicer (i.e., has been registered)
+     *              false   Otherwise
+     */
+    public boolean isExistingLeaf(NodeLocation leaf) {
+        return this.getServicer(leaf) != null;
+    }
+
+    /**
+     * Retrieve the dedicated leaf servicer for the specified leaf.
+     * 
+     * @param leaf  The IPv4 address and port of the leaf
+     * @return      The DedicatedLeafServicer Object of that leaf if it exists.
+     *              Otherwise, null.
+     */
+    public DedicatedLeafServicer getServicer(NodeLocation leaf) {
+
+        // Search the list using the NodeLocation as the search criterion.
+        List<DedicatedLeafServicer> query =
+            this.servicers.stream()
+                .filter((servicer) -> servicer.getDestination().equals(leaf))
+                .collect(Collectors.toList());
+
+        // Check if the query yielded a match or if it came back empty.
+        if (query.size() == 1) {
+            return query.get(0);
+        } else {
+            return null;
+        }
     }
 
     /**

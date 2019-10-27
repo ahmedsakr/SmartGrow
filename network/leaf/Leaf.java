@@ -115,24 +115,25 @@ public class Leaf extends Transport {
     @Override
     public Packet receive() throws CorruptPacketException, IOException {
         this.waitForRegistration();
+        
+        // Return null if the leaf failed to register.
+        if (!this.registered) {
+            return null;
+        }
 
         return super.receive();
     }
 
     /*
-     * Join the lock wait set if registration has still not completed. 
+     * Join the lock wait set if registration has still not completed.
      */
     private void waitForRegistration() {
         synchronized (this.lock) {
             if (!this.registered) {
                 try {
-
-                    // Once we exit the wait set, it is assumed that registration is now
-                    // complete.
-                    // TODO: Check if registration failed?
                     this.lock.wait();
                 } catch (InterruptedException ex) {
-                    logger.error("CRITICAL: interrupted while waiting for leaf registration");
+                    logger.fatal("Interrupted while waiting for leaf registration");
                 }
             }
         }
@@ -157,12 +158,10 @@ public class Leaf extends Transport {
 
                     this.registered = response.isRegistered();
                     if (!response.isRegistered()) {
-                        logger.error("Failed to register with the central processing server");
-
-                        // TODO: how to recover from a failure to register with the server?
+                        logger.fatal("Failed to register with server response: " + response.getRegistrationDetails());
                     }
 
-                    logger.info("Successfully registered with central processing server");
+                    logger.info("Successfully registered with server response: " + response.getRegistrationDetails());
                     
                     this.branchAddress = response.getAddress();
                     this.branchPort = response.getPort();

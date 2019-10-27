@@ -1,5 +1,7 @@
 package network.core.packets;
 
+import java.util.Arrays;
+
 import network.core.OpCodes;
 import network.core.Packet;
 import network.leaf.Identity;
@@ -13,11 +15,31 @@ import network.leaf.Identity;
  */
 public class RegistrationResponse extends Packet {
 
+    private String registrationDetails;
     private boolean status;
 
     public RegistrationResponse() {
         super(OpCodes.REGISTRATION_RESPONSE);
     }
+    
+    /**
+     * Grabs the registration status comment.
+     *
+     * @return A server message regarding the registration attempt.
+     */
+    public String getRegistrationDetails() {
+        return this.registrationDetails;
+    }
+
+    /**
+     * Set the server registration details.
+     *
+     * @param details The status of the registration request.
+     */
+    public void setRegistrationDetails(String details) {
+        this.registrationDetails = details;
+    }
+
 
     /**
      * Retrieves the status of the registration request.
@@ -51,6 +73,8 @@ public class RegistrationResponse extends Packet {
     protected void extract(byte[] payload) {
         boolean status = payload[1] == 1 ? true : false;
         this.setStatus(status);
+
+        this.setRegistrationDetails(super.getString(Arrays.copyOfRange(payload, 2, payload.length)));
     }
 
     /**
@@ -62,5 +86,6 @@ public class RegistrationResponse extends Packet {
     @Override
     protected void build() {
         super.addByte(this.status == true ? (byte)1 : (byte)0);
+        super.addString(this.getRegistrationDetails());
     }
 }
