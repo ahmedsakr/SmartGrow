@@ -28,6 +28,7 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
     // The thread that this instance runs in.
     private Thread serviceThread;
     private boolean ready;
+    private long lastReceivedTime;
 
     /**
      * Initialize the state of the DedicatedLeafServicer thread.
@@ -37,9 +38,22 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
     public DedicatedLeafServicer(NodeLocation leafAddress) throws SocketException {
         super(leafAddress);
 
+        // Begin tracking when the last packet was received from the leaf.
+        this.lastReceivedTime = System.currentTimeMillis();
+
         // Start the servicer once initialization is complete
         this.serviceThread = new Thread(this, "LeafServicer-" + leafAddress.getPort());
         this.serviceThread.start();
+    }
+
+    /**
+     * Retrieve the time (in milliseconds) when this thread has last received a packet
+     * from the leaf.
+     *
+     * @return Epoch time (in milliseconds) of the last time a packet was received.
+     */
+    public long getLastReceivedTime() {
+        return this.lastReceivedTime;
     }
 
     /**
@@ -102,6 +116,10 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
             while (true) {
                 Packet request = this.receive();
                 logger.info("received packet from leaf: " + request);
+
+                synchronized (this) {
+                    this.lastReceivedTime = System.currentTimeMillis();
+                }
             }
         } catch (TransportInterruptedException ex) {
             logger.info("Ending servicer for " + this.getDestination());

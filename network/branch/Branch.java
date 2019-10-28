@@ -1,6 +1,7 @@
 package network.branch;
 
 import network.core.Packet;
+import network.branch.threads.LeafPruningThread;
 import network.core.NodeLocation;
 
 import java.io.IOException;
@@ -25,12 +26,35 @@ public class Branch {
 
     // The list of live nodes connected to this stem.
     private ArrayList<DedicatedLeafServicer> servicers;
+    private String name;
+    private LeafPruningThread pruner;
 
     /**
      * Initializes the branch with a random port.
      */
-    public Branch() {
+    public Branch(String name) {
         this.servicers = new ArrayList<>();
+        this.name = name;
+
+        this.pruner = new LeafPruningThread(this);
+    }
+    
+    /**
+     * Retrieve the currently active leaf servicers.
+     * 
+     * @return A list of all DedicatedLeafServicers on this branch.
+     */
+    public synchronized ArrayList<DedicatedLeafServicer> getServicers() {
+        return this.servicers;
+    }
+
+    /**
+     * Retrieve the name of this branch.
+     *
+     * @return A string name of this branch.
+     */
+    public String getName() {
+        return this.name;
     }
 
     /**
@@ -72,7 +96,7 @@ public class Branch {
      * 
      * @param location The IPv4 address of the leaf
      */
-    public void addLeaf(NodeLocation location) throws SocketException {
+    public synchronized void addLeaf(NodeLocation location) throws SocketException {
         logger.info("Adding a new leaf servicer for " + location);
         this.servicers.add(new DedicatedLeafServicer(location));
     }
@@ -82,7 +106,7 @@ public class Branch {
      * 
      * @param location The IPv4 address of the leaf
      */
-    public void removeLeaf(NodeLocation location) {
+    public synchronized void removeLeaf(NodeLocation location) {
         for (DedicatedLeafServicer servicer : this.servicers) {
             if (servicer.getDestination().equals(location)) {
                 logger.info("Stop leaf servicer for " + location);
@@ -98,11 +122,21 @@ public class Branch {
      * 
      * @param packet The packet to broadcast to all leaves
      */
-    public void broadcast(Packet packet) throws IOException {
+    public synchronized void broadcast(Packet packet) throws IOException {
         logger.debug("Broadcasting packet to all leaves");
 
         for (DedicatedLeafServicer servicer : this.servicers) {
             servicer.forwardBroadcast(packet);
         }
+    }
+
+    /**
+     * Override the default Object toString() method to return the name of this branch.
+     * 
+     * @return The name of this branch.
+     */
+    @Override
+    public String toString() {
+        return this.name;
     }
 }

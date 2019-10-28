@@ -34,8 +34,8 @@ public class Stem extends Transport {
     public Stem(int port) throws SocketException {
         super(port);
 
-        this.plants = new Branch();
-        this.users = new Branch();
+        this.plants = new Branch("Plants");
+        this.users = new Branch("Users");
         this.listenForClients();
     }
 
