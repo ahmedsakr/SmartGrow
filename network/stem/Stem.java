@@ -49,7 +49,6 @@ public class Stem extends Transport {
     @Override
     public void send(Packet p) throws TransportInterruptedException, IOException {
         logger.warn("Send packet attempted on receive-only transport");
-        return;
     }
 
     /**
@@ -61,7 +60,13 @@ public class Stem extends Transport {
             try {
                 while (true) {
                     LeafRegistration packet = (LeafRegistration) this.receive();
-                    logger.info("New client from " + packet.getAddress() + ":" + packet.getPort());
+                    NodeLocation location = new NodeLocation(packet.getAddress(), packet.getPort());
+                    logger.info("New client from " + location);
+
+                    if (this.plants.isExistingLeaf(location) || this.users.isExistingLeaf(location)) {
+                        logger.warn("Repeated registration request from " + location);
+                        continue;
+                    }
 
                     if (packet.getIdentity() == Identity.ANDROID_USER) {
                         this.users.addLeaf(new NodeLocation(packet.getAddress(), packet.getPort()));

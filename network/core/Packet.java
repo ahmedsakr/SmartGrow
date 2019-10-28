@@ -254,6 +254,22 @@ public abstract class Packet {
     }
 
     /**
+     * Extracts string from the array by searching for the terminating byte.
+     *
+     * @param array The byte-array containing the characters of the string
+     * @return A string representation of the byte array.
+     */
+    protected String getString(byte[] array) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == (byte)0) {
+                return new String(array, 0, i);
+            }
+        }
+
+        return new String(array, 0, array.length);
+    }
+
+    /**
      * Appends a boolean into the packet.
      * 
      * @param value The boolean being inserted into the packet

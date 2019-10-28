@@ -81,6 +81,7 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
         // Inform the leaf that they have been registered
         RegistrationResponse response = new RegistrationResponse();
         response.setStatus(true);
+        response.setRegistrationDetails("OK");
         
         try {
             this.send(response);

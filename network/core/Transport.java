@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 import org.apache.logging.log4j.LogManager;
@@ -22,6 +23,9 @@ import network.core.exceptions.TransportInterruptedException;
  * @since October 10, 2019
  */
 public class Transport {
+
+    // The default time to wait before timing out on a receive with timeout.
+    public static final int RECEIVE_TIMEOUT_MS = 3000;
 
     private static Logger logger = LogManager.getLogger(Transport.class);
 
@@ -150,6 +154,37 @@ public class Transport {
         }
 
         return packet;
+    }
+
+    /**
+     * Attempt to receive a UDP packet within a certain timeout threshold.
+     * 
+     * @return      A packet interpretation of the payload (if received in time).
+     *              Otherwise, if no packet is received, null is returned.
+     */
+    public Packet receiveWithTimeout() throws CorruptPacketException, TransportInterruptedException, IOException {
+        
+        Packet payload = null;
+
+        try {
+            this.socket.setSoTimeout(RECEIVE_TIMEOUT_MS);
+            payload = this.receive();
+        } catch (SocketTimeoutException ex) {
+
+            // Concering scenario - No packet received after the timeout threshold.
+            // However, it's not an error scenario that we should be concerned about yet.
+            logger.warn("Timed out after waiting " + RECEIVE_TIMEOUT_MS + " milliseconds.");
+        } catch (SocketException ex) {
+
+            // This is concerning: the inability to set timeout will cause the system
+            // to behave weirdly.
+            logger.fatal("Unable to set timeout on transport");
+        } finally {
+
+            // Restore the infinite timeout on this socket before exiting.
+            this.socket.setSoTimeout(0);
+            return payload;
+        }
     }
 
     /**
