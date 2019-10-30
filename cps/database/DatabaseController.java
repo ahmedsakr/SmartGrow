@@ -2,7 +2,9 @@ package cps.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
@@ -36,8 +38,19 @@ public class DatabaseController {
     public DatabaseController() throws SmartgrowDatabaseException {
 
         // Establish connection with the Postgres database.
-        this.connectToDatabase();
+        this.connect();
+
         logger.debug("Established database connection");
+    }
+
+    /**
+     * Query the database with the provided SQL prepared statement.
+     *
+     * @param sql The prepared statement
+     */
+    public ResultSet query(String sql) throws SQLException {
+        Statement statement = this.dbConnection.createStatement();
+        return statement.executeQuery(sql);
     }
 
     /**
@@ -47,13 +60,7 @@ public class DatabaseController {
      * @throws SmartgrowDatabaseException
      * @see {@link cps.database.DatabaseInfo}
      */
-    private void connectToDatabase() throws SmartgrowDatabaseException {
-
-        // Specify the database user, password, and SSL requirement for the connection.
-        Properties dbCredentials = new Properties();
-        dbCredentials.setProperty("user", DatabaseInfo.DATABASE_USER);
-        dbCredentials.setProperty("password", System.getenv(DatabaseInfo.DATABASE_PASSWORD));
-        dbCredentials.setProperty("ssl", "false");
+    private void connect() throws SmartgrowDatabaseException {
 
         // Attempt to retrieve the dynamic database user password from the environment.
         String user_password = System.getenv(DatabaseInfo.DATABASE_PASSWORD);
@@ -62,6 +69,12 @@ public class DatabaseController {
             // The Smartgrow database user password variable is not set in the system.
             throw new SmartgrowDatabaseException("Database user environment variable not set");
         }
+
+        // Specify the database user, password, and SSL requirement for the connection.
+        Properties dbCredentials = new Properties();
+        dbCredentials.setProperty("user", DatabaseInfo.DATABASE_USER);
+        dbCredentials.setProperty("password", user_password);
+        dbCredentials.setProperty("ssl", "false");
 
         try {
             this.dbConnection = DriverManager.getConnection(DatabaseInfo.DATABASE_URL, dbCredentials);
