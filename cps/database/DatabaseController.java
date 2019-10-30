@@ -47,10 +47,36 @@ public class DatabaseController {
      * Query the database with the provided SQL prepared statement.
      *
      * @param sql The prepared statement
+     * @return The result of the query
      */
-    public ResultSet query(String sql) throws SQLException {
-        Statement statement = this.dbConnection.createStatement();
-        return statement.executeQuery(sql);
+    public ResultSet query(String sql) throws SmartgrowDatabaseException {
+        try {
+
+            // Execute the result-returning query.
+            Statement statement = this.dbConnection.createStatement();
+            return statement.executeQuery(sql);
+
+        } catch (SQLException ex) {
+            throw new SmartgrowDatabaseException(ex.getMessage());
+        }
+    }
+
+    /**
+     * Query the database with an INSERT, UPDATE, or DELETE (i.e., statements
+     * that do not return a result).
+     *
+     * @param sql The prepared statement
+     */
+    public void update(String sql) throws SmartgrowDatabaseException {
+        try {
+
+            // Execute the no-result update query.
+            Statement statement = this.dbConnection.createStatement();
+            statement.executeUpdate(sql);
+
+        } catch (SQLException ex) {
+            throw new SmartgrowDatabaseException(ex.getMessage());
+        }
     }
 
     /**
