@@ -47,9 +47,6 @@ public class Leaf extends Transport {
     private Identity identity;
     private boolean registered;
 
-    // The assigned branch's networking address and port
-    private NodeLocation branchLocation;
-
     /**
      * Create a Leaf with a provided identity.
      * 
@@ -81,15 +78,6 @@ public class Leaf extends Transport {
      */
     public Identity getIdentity() {
         return this.identity;
-    }
-
-    /**
-     * Override the branch location to a new destination.
-     * 
-     * @param location The IPv4 address and port of the branch.
-     */
-    public synchronized void setBranchLocation(NodeLocation location) {
-        this.branchLocation = location;
     }
 
     /**
@@ -134,7 +122,7 @@ public class Leaf extends Transport {
             }
 
             // Override the destination address and port to the branch assigned to this leaf.
-            packet.setDestination(this.branchLocation.getIpAddress(), this.branchLocation.getPort());
+            packet.setDestination(this.getDestination().getIpAddress(), this.getDestination().getPort());
         }
 
         super.send(packet);
