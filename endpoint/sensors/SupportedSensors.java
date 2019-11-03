@@ -21,4 +21,26 @@ public class SupportedSensors {
 
     // Water content in the environment air
     public static final byte AIR_HUMIDITY = 4;
+
+    /**
+     * Provide a string representation for the sensors based on the
+     * given id.
+     *
+     * @param sensorId The id of the sensor
+     * @return The name of the sensor value
+     */
+    public static String getStringRepresentation(byte sensorId) {
+        switch (sensorId) {
+            case LIGHT_INTENSITY:
+                return "Light Intensity";
+            case SOIL_MOISTURE:
+                return "Soil Moisture";
+            case AIR_TEMPERATURE:
+                return "Temperature";
+            case AIR_HUMIDITY:
+                return "Humidity";
+            default:
+                return "Unknown Sensor";
+        }
+    }
 }

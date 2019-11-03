@@ -3,6 +3,7 @@ package network.core.packets;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import endpoint.sensors.SupportedSensors;
 import network.core.OpCodes;
 import network.core.Packet;
 
@@ -34,6 +35,13 @@ public class SensorsData extends Packet {
      */
     public void addSensorData(byte sensorId, double sensorData) {
         this.data.put(sensorId, sensorData);
+    }
+
+    /**
+     * Empty all sensors added to this packet.
+     */
+    public void clear() {
+        this.data.clear();
     }
 
     /**
@@ -80,5 +88,24 @@ public class SensorsData extends Packet {
             super.addByte(sensorId);
             super.addDouble(this.data.get(sensorId));
         }
+    }
+    
+    /**
+     * Override the default toString() implementation to provide a list of
+     * sensor names and their values.
+     */
+    @Override
+    public String toString() {
+        final StringBuilder builder = new StringBuilder("");
+
+        // Represent all sensors in one line of pairs: their name followed by their vlaue.
+        this.data.keySet().stream()
+            .forEach((sensor) -> 
+                builder.append(String.format("%s: %f ",
+                     SupportedSensors.getStringRepresentation(sensor), this.data.get(sensor)
+                ))
+            );
+
+        return builder.toString();
     }
 }
