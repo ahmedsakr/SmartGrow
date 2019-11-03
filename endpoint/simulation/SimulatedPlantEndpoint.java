@@ -67,7 +67,7 @@ public class SimulatedPlantEndpoint extends Thread {
      * @param startValue The start value of the sensor
      * @return A simulated value based on an arbirtary sinusoidal function.
      */
-    public double getSimulatedValue(double startValue) {
+    private double getSimulatedValue(double startValue) {
         double timeDifferenceSeconds = ((double)System.currentTimeMillis() - this.startTime) / 1000;
         double sinValue = Math.sin(2 * Math.PI * (timeDifferenceSeconds / this.simulationCycle));
 
