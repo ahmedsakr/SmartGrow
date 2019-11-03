@@ -102,6 +102,7 @@ public class SimulatedPlantEndpoint extends Thread {
                 data.addSensorData(SupportedSensors.SOIL_MOISTURE, getSimulatedValue(this.SOIL_MOISTURE_START));
 
                 logger.info("Sending SensorsData packet: " + data);
+
                 // Dispatch the packet to the server.
                 this.leaf.send(data);
             } catch (InterruptedException | IOException ex) {
