@@ -97,7 +97,7 @@ public class LeafRegistrationThread extends Thread {
                         // The response should have been sent from a dedicated branch socket
                         // created for us. We must save it as this will be our communication
                         // point moving forward.
-                        this.leaf.setBranchLocation(new NodeLocation(response.getAddress(), response.getPort()));
+                        this.leaf.setDestination(new NodeLocation(response.getAddress(), response.getPort()));
                     }
                 }
 
