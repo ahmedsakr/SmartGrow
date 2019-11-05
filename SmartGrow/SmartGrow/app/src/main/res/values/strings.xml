@@ -4,12 +4,4 @@
     <string name="soil_moisture">Soil Moisture</string>
     <string name="air_temperature">Air Temperature</string>
     <string name="air_humidity">Air Humidity</string>
-    <!--
-    %f is the placeholder for a float/double.
-    1$ is the first argument after the resource reference ie R.string.string_name
-    -->
-    <string name="lightIntensity">%f</string>
-    <string name="soilMoisture">Current Reading: %f</string>
-    <string name="airTemperature">Current Reading: %f</string>
-    <string name="airHumidity">Current Reading: %f</string>
 </resources>
