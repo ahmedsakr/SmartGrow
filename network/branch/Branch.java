@@ -1,6 +1,7 @@
 package network.branch;
 
 import network.core.Packet;
+import network.branch.threads.DedicatedLeafServicer;
 import network.branch.threads.LeafPruningThread;
 import network.core.NodeLocation;
 
@@ -12,6 +13,8 @@ import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import cps.management.LeafManager;
 
 /**
  * Branch allows for a logical grouping of one or more
@@ -26,6 +29,7 @@ public class Branch {
 
     // The list of live nodes connected to this stem.
     private ArrayList<DedicatedLeafServicer> servicers;
+    private LeafManager manager;
     private String name;
     private LeafPruningThread pruner;
 
@@ -98,7 +102,7 @@ public class Branch {
      */
     public synchronized void addLeaf(NodeLocation location) throws SocketException {
         logger.info("Adding a new leaf servicer for " + location);
-        this.servicers.add(new DedicatedLeafServicer(location));
+        this.servicers.add(new DedicatedLeafServicer(this, location));
     }
 
     /**
@@ -115,6 +119,31 @@ public class Branch {
                 break;
             }
         }
+    }
+
+    /**
+     * Attach a leaf manager that the dedicated leaf managers on this branch
+     * will invoke when handling the interactions with their leaves.
+     *
+     * @param manager The LeafManager instance that dictates the interactions
+     *                with the leaves on this branch.
+     */
+    public void attachManager(LeafManager manager) {
+        this.manager = manager;
+    }
+
+    /**
+     * Manage a packet received by a DedicatedLeafServicer.
+     *
+     * @param packet The received packet by the servicer.
+     * @return The status of the management operation
+     */
+    public boolean manage(Packet packet) {
+        if (this.manager == null) {
+            return false;
+        }
+
+        return this.manager.handle(packet);
     }
 
     /**

@@ -6,6 +6,7 @@ import java.net.SocketException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import cps.management.LeafManager;
 import network.branch.Branch;
 import network.core.NodeLocation;
 import network.core.Packet;
@@ -37,6 +38,24 @@ public class Stem extends Transport {
         this.plants = new Branch("Plants");
         this.users = new Branch("Users");
         this.listenForClients();
+    }
+
+    /**
+     * Installs a manager for the plants in the SmartGrow system.
+     *
+     * @param manager A LeafManager implementing instance.
+     */
+    public void addPlantsManager(LeafManager manager) {
+        this.plants.attachManager(manager);
+    }
+
+    /**
+     * Installs a manager for the android users in the SmartGrow system.
+     *
+     * @param manager A LeafManager implementing instance.
+     */
+    public void addAndroidUsersManager(LeafManager manager) {
+        this.users.attachManager(manager);
     }
 
     /**

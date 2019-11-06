@@ -20,4 +20,7 @@ public class DatabaseInfo {
 
     // This is the environment variable name which will be used to dynamically retrieve the password.
     public static final String DATABASE_PASSWORD = "SMARTGROW_PASSWORD";
+
+    // The table name for the plant sensors data
+    public static final String DATABASE_SENSORS_TABLE = "plant_data";
 }

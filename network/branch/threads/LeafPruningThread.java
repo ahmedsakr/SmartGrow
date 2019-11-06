@@ -8,7 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import network.branch.Branch;
-import network.branch.DedicatedLeafServicer;
+import network.branch.threads.DedicatedLeafServicer;
 
 /**
  * LeafPruningThread is spawned when a branch is created to
