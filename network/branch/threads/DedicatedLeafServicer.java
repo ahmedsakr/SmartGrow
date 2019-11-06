@@ -1,4 +1,4 @@
-package network.branch;
+package network.branch.threads;
 
 import java.io.IOException;
 import java.lang.Runnable;
@@ -7,6 +7,7 @@ import java.net.SocketException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import network.branch.Branch;
 import network.core.NodeLocation;
 import network.core.Packet;
 import network.core.Transport;
@@ -27,19 +28,25 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
 
     // The thread that this instance runs in.
     private Thread serviceThread;
+
+    // The branch that this servicer belongs to
+    private Branch branch;
     private boolean ready;
     private long lastReceivedTime;
 
     /**
      * Initialize the state of the DedicatedLeafServicer thread.
      * 
+     * @param branch The branch that this servicer belongs to
      * @param leafAddress The IPv4 address (and port) of the leaf
      */
-    public DedicatedLeafServicer(NodeLocation leafAddress) throws SocketException {
+    public DedicatedLeafServicer(Branch branch, NodeLocation leafAddress) throws SocketException {
         super(leafAddress);
 
         // Begin tracking when the last packet was received from the leaf.
         this.lastReceivedTime = System.currentTimeMillis();
+
+        this.branch = branch;
 
         // Start the servicer once initialization is complete
         this.serviceThread = new Thread(this, "LeafServicer-" + leafAddress.getPort());
@@ -112,7 +119,7 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
             //
             // For now, all it does is receive but it will not respond.
             // Once we have the implementation of the rest of the system,
-            // this hsould be changed to fulfill leaf requests
+            // this should be changed to fulfill leaf requests
             while (true) {
                 Packet request = this.receive();
                 logger.info("received packet from leaf: " + request);
@@ -120,6 +127,8 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
                 synchronized (this) {
                     this.lastReceivedTime = System.currentTimeMillis();
                 }
+
+                this.branch.manage(request);
             }
         } catch (TransportInterruptedException ex) {
             logger.info("Ending servicer for " + this.getDestination());

@@ -7,6 +7,8 @@ import org.apache.logging.log4j.Logger;
 
 import cps.database.DatabaseController;
 import cps.database.exceptions.SmartgrowDatabaseException;
+import cps.management.managers.AndroidUserManager;
+import cps.management.managers.PlantEndpointManager;
 import network.Configuration;
 import network.stem.Stem;
 
@@ -38,6 +40,10 @@ public class CentralProcessingServer {
             logger.fatal("Unable to create database controller: " + ex.getMessage());
             System.exit(1);
         }
+
+        // Attach the leaf managers to the stem.
+        this.stem.addPlantsManager(new PlantEndpointManager(this.controller));
+        this.stem.addAndroidUsersManager(new AndroidUserManager(this.controller));
     }
 
     public static void main(String[] args) {
