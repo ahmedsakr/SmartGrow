@@ -1,0 +1,7 @@
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">SmartGrow</string>
+    <string name="light_intensity">Light Intensity</string>
+    <string name="soil_moisture">Soil Moisture</string>
+    <string name="air_temperature">Air Temperature</string>
+    <string name="air_humidity">Air Humidity</string>
+</resources>
