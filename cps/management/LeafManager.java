@@ -18,5 +18,5 @@ public interface LeafManager {
      * @return      true    If handling went as expected
      *              false   Otherwise
      */
-    boolean handle(Packet packet);
+    Packet handle(Packet packet);
 }

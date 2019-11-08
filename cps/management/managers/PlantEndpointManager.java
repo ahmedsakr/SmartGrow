@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import cps.database.DatabaseController;
 import cps.database.exceptions.SmartgrowDatabaseException;
-import cps.database.wrappers.PlantData;
+import cps.database.tables.PlantData;
 import cps.management.LeafManager;
 import network.core.Packet;
 import network.core.packets.SensorsData;
@@ -41,9 +41,9 @@ public class PlantEndpointManager implements LeafManager {
      * The handling implementation for plant endpoints.
      */
     @Override
-    public boolean handle(Packet packet) {
-        if (!(packet instanceof SensorsData)) {
-            return false;
+    public Packet handle(Packet packet) {
+        if (packet == null || !(packet instanceof SensorsData)) {
+            return null;
         }
 
         try {
@@ -53,9 +53,11 @@ public class PlantEndpointManager implements LeafManager {
 
         } catch (SmartgrowDatabaseException ex) {
             logger.fatal("Unable to append data: " + ex.getMessage());
-            return false;
+            return null;
         }
 
-        return true;
+        // No return value for now: What to do when a plant endpoint
+        // gives us values?
+        return null;
     }
 }

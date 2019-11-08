@@ -101,7 +101,11 @@ public class Transport {
      * @throws IOException
      */
     public void send(Packet packet) throws TransportInterruptedException, IOException {
-        
+
+        if (packet == null) {
+            return;
+        }
+
         // Finalize the packet payload.
         packet.compile();
 

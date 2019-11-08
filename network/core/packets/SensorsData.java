@@ -25,6 +25,9 @@ public class SensorsData extends Packet {
     public SensorsData() {
         super(OpCodes.SENSORS_DATA);
         this.data = new HashMap<>();
+
+        // Initialize the hashmap with the starting value of the sensors.
+        this.initialize();
     }
 
     /**
@@ -53,6 +56,16 @@ public class SensorsData extends Packet {
      */
     public double getSensorData(byte sensorId) {
         return this.data.get(sensorId);
+    }
+
+    /**
+     * Initialize the sensors value to -1.
+     */
+    private void initialize() {
+        this.data.put(SupportedSensors.AIR_HUMIDITY, -1.0);
+        this.data.put(SupportedSensors.AIR_TEMPERATURE, - 1.0);
+        this.data.put(SupportedSensors.LIGHT_INTENSITY, -1.0);
+        this.data.put(SupportedSensors.SOIL_MOISTURE, -1.0);
     }
 
     /**

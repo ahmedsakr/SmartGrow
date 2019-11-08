@@ -12,4 +12,5 @@ public class OpCodes {
     public static final byte LEAF_REGISTRATION = 0;
     public static final byte REGISTRATION_RESPONSE = 1;
     public static final byte SENSORS_DATA = 2;
+    public static final byte REQUEST_SENSORS = 3;
 }

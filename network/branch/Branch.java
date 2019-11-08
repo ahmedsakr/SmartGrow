@@ -138,9 +138,9 @@ public class Branch {
      * @param packet The received packet by the servicer.
      * @return The status of the management operation
      */
-    public boolean manage(Packet packet) {
+    public Packet manage(Packet packet) {
         if (this.manager == null) {
-            return false;
+            return null;
         }
 
         return this.manager.handle(packet);

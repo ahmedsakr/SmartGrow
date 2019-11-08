@@ -9,6 +9,7 @@ import java.util.zip.CRC32;
 
 import network.core.packets.LeafRegistration;
 import network.core.packets.RegistrationResponse;
+import network.core.packets.RequestSensors;
 import network.core.packets.SensorsData;
 import network.core.exceptions.CRCVerificationException;
 import network.core.exceptions.CorruptPacketException;
@@ -101,6 +102,9 @@ public abstract class Packet {
                 break;
             case OpCodes.SENSORS_DATA:
                 pkt = new SensorsData();
+                break;
+            case OpCodes.REQUEST_SENSORS:
+                pkt = new RequestSensors();
                 break;
             default:
                 throw new OpCodeNotRecognizedException("Packet OpCode is not recognized");

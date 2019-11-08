@@ -13,6 +13,7 @@ CREATE TABLE recommended_properties(
 
 CREATE TABLE plant_data(
     plant_id NUMERIC,
+    time_taken TIMESTAMP,
     light_intensity NUMERIC,
     air_humidity NUMERIC,
     air_temperature NUMERIC,

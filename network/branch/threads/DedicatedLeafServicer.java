@@ -128,7 +128,8 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
                     this.lastReceivedTime = System.currentTimeMillis();
                 }
 
-                this.branch.manage(request);
+                // Manage the packet and send the response back to the leaf
+                this.send(this.branch.manage(request));
             }
         } catch (TransportInterruptedException ex) {
             logger.info("Ending servicer for " + this.getDestination());
