@@ -1,4 +1,4 @@
-package network.core.packets;
+package network.core.packets.sensors;
 
 import java.util.Arrays;
 import java.util.HashMap;

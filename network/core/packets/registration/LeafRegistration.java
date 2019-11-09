@@ -1,4 +1,4 @@
-package network.core.packets;
+package network.core.packets.registration;
 
 import network.core.OpCodes;
 import network.core.Packet;

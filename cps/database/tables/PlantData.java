@@ -4,7 +4,7 @@ import cps.database.DatabaseInfo;
 import cps.database.exceptions.SmartgrowDatabaseException;
 import cps.database.DatabaseController;
 import endpoint.sensors.SupportedSensors;
-import network.core.packets.SensorsData;
+import network.core.packets.sensors.SensorsData;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -11,8 +11,6 @@ import network.core.NodeLocation;
 import network.core.Packet;
 import network.core.Transport;
 import network.core.exceptions.CorruptPacketException;
-import network.core.packets.LeafRegistration;
-import network.core.packets.RegistrationResponse;
 import network.leaf.threads.LeafRegistrationThread;
 
 /**
@@ -122,7 +120,7 @@ public class Leaf extends Transport {
             }
 
             // Override the destination address and port to the branch assigned to this leaf.
-            packet.setDestination(this.getDestination().getIpAddress(), this.getDestination().getPort());
+            packet.setDestination(this.getDestination());
         }
 
         super.send(packet);
