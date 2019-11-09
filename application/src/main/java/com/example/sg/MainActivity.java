@@ -17,7 +17,8 @@ import network.leaf.Leaf;
 import network.core.packets.sensors.*;
 
 /**
- * Displays the sensors from the plant endpoints.
+ * Application for monitoring plants registered in the SmartGrow system.
+ *
  *
  * @author Valerie Figuracion
  */
@@ -33,16 +34,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        requestInfo();
-        sensorInfo();
-    }
-
-    protected void requestInfo(){
-        new Thread(() -> requestSensors = new RequestSensors()).start();
-    }
-
-    protected void sensorInfo(){
-
         //Initialize a leaf for the user.
         try {
             leaf = new Leaf(Identity.ANDROID_USER);
@@ -50,6 +41,21 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        requestInfo();
+        sensorInfo();
+    }
+
+    /**
+     * Repeatedly request information from the database for updating.
+     */
+    protected void requestInfo(){
+        new Thread(() -> requestSensors = new RequestSensors()).start();
+    }
+
+    /**
+     * Displays the sensors for each plant registered to the user.
+     */
+    protected void sensorInfo(){
         try {
             //Initialize a leaf for receiving the sensor information.
             Packet pkt = leaf.receive();
@@ -74,5 +80,14 @@ public class MainActivity extends AppCompatActivity {
         } catch (CorruptPacketException | IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Pop ups that alert the user about the condition of their plant if it is not in ideal conditions.
+     */
+    protected void popUpErrors(){
+
+
+
     }
 }
