@@ -6,9 +6,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import network.core.NodeLocation;
+import network.core.Packet;
 import network.core.exceptions.CorruptPacketException;
-import network.core.packets.LeafRegistration;
-import network.core.packets.RegistrationResponse;
+import network.core.packets.GenericError;
+import network.core.packets.registration.LeafRegistration;
+import network.core.packets.registration.RegistrationResponse;
 import network.leaf.Leaf;
 
 /**
@@ -41,16 +43,15 @@ public class LeafRegistrationThread extends Thread {
      * Attempt to register with the central processing server with multiple
      * attempts if necessary.
      * 
-     * @return    A RegistrationResponse packet if the server responded to us.
-     *            Otherwise, if no response was received, null is returned.
+     * @return    A packet sent from the server
      */
-    private RegistrationResponse attemptRegistration() throws IOException, CorruptPacketException {
+    private Packet attemptRegistration() throws IOException, CorruptPacketException {
 
         // Initialize the LeafRegistration request packet with out identity.
         LeafRegistration registration = new LeafRegistration();
         registration.setIdentity(this.leaf.getIdentity());
         
-        RegistrationResponse response = null;
+        Packet response = null;
         for (int i = 0; i < REGISTRATION_ATTEMPTS; i++) {
 
             // Request registration by sending the LeafRegistration packet
@@ -58,7 +59,7 @@ public class LeafRegistrationThread extends Thread {
             leaf.send(registration);
 
             // Wait for a response from the server
-            response = (RegistrationResponse) leaf.receiveWithTimeout();
+            response = leaf.receiveWithTimeout();
             if (response != null) {
                 break;
             }
@@ -78,26 +79,41 @@ public class LeafRegistrationThread extends Thread {
         synchronized (this.leaf) {
             try {
 
-                RegistrationResponse response = this.attemptRegistration();
+                Packet response = this.attemptRegistration();
 
                 if (response == null) {
 
                     // The maximum attempts to register have been exhausted. We give up now.
                     logger.fatal("No response after " + REGISTRATION_ATTEMPTS + " attempts.");
                 } else {
-                    this.leaf.setRegistered(response.isRegistered());
 
-                    if (!response.isRegistered()) {
-                        logger.fatal("Failed to register with server response: " + response.getRegistrationDetails());
-                    } else {
+                    if (response instanceof GenericError) {
 
-                        logger.info(
-                                "Successfully registered with server response: " + response.getRegistrationDetails());
+                        // The server did not admit us on grounds of a serious error
+                        logger.fatal("Failed to register, received GenericError: " + response);
+                    } else if (response instanceof RegistrationResponse) {
 
-                        // The response should have been sent from a dedicated branch socket
-                        // created for us. We must save it as this will be our communication
-                        // point moving forward.
-                        this.leaf.setDestination(new NodeLocation(response.getAddress(), response.getPort()));
+                        RegistrationResponse registration = (RegistrationResponse) response;
+
+                        if (!registration.isRegistered()) {
+                            
+                            // The server still did not admit us by not setting the registered status to true
+                            logger.fatal("Failed to register with server response: " +
+                                registration.getRegistrationDetails());
+                        } else {
+
+                            logger.info("Successfully registered with server response: " +
+                                registration.getRegistrationDetails());
+
+                            // The response should have been sent from a dedicated branch socket
+                            // created for us. We must save it as this will be our communication
+                            // point moving forward.
+                            this.leaf.setDestination(new NodeLocation(response.getAddress(), response.getPort()));
+
+                            // Set the leaf registration status to true so that the send() and receive() methods
+                            // on the leaf no longer move the caller into the wait set.
+                            this.leaf.setRegistered(true);
+                        }
                     }
                 }
 

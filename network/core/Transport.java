@@ -112,7 +112,7 @@ public class Transport {
         if (this.destination != null) {
             
             // Override the destination of the packet based on the transport destination
-            packet.setDestination(this.destination.getIpAddress(), this.destination.getPort());
+            packet.setDestination(this.destination);
         }
 
         // Dispatch the packet.

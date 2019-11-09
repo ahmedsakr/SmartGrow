@@ -7,7 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import endpoint.sensors.SupportedSensors;
-import network.core.packets.SensorsData;
+import network.core.packets.sensors.SensorsData;
 import network.leaf.Identity;
 import network.leaf.Leaf;
 

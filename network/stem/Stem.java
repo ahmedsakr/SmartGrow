@@ -13,7 +13,6 @@ import network.core.Packet;
 import network.core.Transport;
 import network.core.exceptions.CorruptPacketException;
 import network.core.exceptions.TransportInterruptedException;
-import network.core.packets.LeafRegistration;
 import network.leaf.Identity;
 import network.stem.threads.StemListener;
 
@@ -53,39 +52,33 @@ public class Stem extends Transport {
     }
 
     /**
-     * Installs a manager for the plants in the SmartGrow system.
+     * Register a manager for leaves with the provided identity.
      *
-     * @param manager A LeafManager implementing instance.
+     * @param leafIdentity The identity of leaves to be managed by the given manager
+     * @param manager The manager providing the interaction behaviour with the targetted leaves
      */
-    public void addPlantsManager(LeafManager manager) {
-        this.plants.attachManager(manager);
+    public void addManager(Identity leafIdentity, LeafManager manager) {
+        if (leafIdentity == Identity.PLANT_ENDPOINT) {
+            this.plants.attachManager(manager);
+        } else {
+            this.users.attachManager(manager);
+        }
     }
 
     /**
-     * Installs a manager for the android users in the SmartGrow system.
+     * Register a leaf by inserting it into the appropriate branch.
      *
-     * @param manager A LeafManager implementing instance.
+     * @param location The NodeLocation object containing the IPv4 address and port of the leaf.
+     * @param leafIdentity The identity that the leaf provided
+     * 
+     * @throws SocketException If the branch failed to start a DedicatedLeafServicer
      */
-    public void addAndroidUsersManager(LeafManager manager) {
-        this.users.attachManager(manager);
-    }
-
-    /**
-     * Retrieve the branch that the plants reside on.
-     *
-     * @return A branch instance of the active plants.
-     */
-    public Branch getPlantsBranch() {
-        return this.plants;
-    }
-
-    /**
-     * Retrieve the branch that the android users reside on.
-     *
-     * @return A branch instance of the active android users.
-     */
-    public Branch getUsersBranch() {
-        return this.users;
+    public void registerLeaf(NodeLocation location, Identity leafIdentity) throws SocketException {
+        if (leafIdentity == Identity.PLANT_ENDPOINT) {
+            this.plants.addLeaf(location);
+        } else {
+            this.users.addLeaf(location);
+        }
     }
 
     /**
@@ -98,17 +91,5 @@ public class Stem extends Transport {
      */
     public boolean isExistingLeaf(NodeLocation location) {
         return this.users.isExistingLeaf(location) || this.plants.isExistingLeaf(location);
-    }
-
-    /**
-     * Erase the send implementation because the port the stem is listening on
-     * is receive-only; any sends must be done through the dedicated servicer
-     * on a branch.
-     * 
-     * @param p The packet intended to be sent
-     */
-    @Override
-    public void send(Packet p) throws TransportInterruptedException, IOException {
-        logger.warn("Send packet attempted on receive-only transport");
     }
 }

@@ -13,7 +13,7 @@ import network.core.Packet;
 import network.core.Transport;
 import network.core.exceptions.CorruptPacketException;
 import network.core.exceptions.TransportInterruptedException;
-import network.core.packets.RegistrationResponse;
+import network.core.packets.registration.RegistrationResponse;
 
 /**
  * DedicatedLeafServicer is an exclusive thread spawned by branches

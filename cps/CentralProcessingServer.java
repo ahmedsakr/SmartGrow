@@ -10,6 +10,7 @@ import cps.database.exceptions.SmartgrowDatabaseException;
 import cps.management.managers.AndroidUserManager;
 import cps.management.managers.PlantEndpointManager;
 import network.Configuration;
+import network.leaf.Identity;
 import network.stem.Stem;
 
 /**
@@ -41,9 +42,9 @@ public class CentralProcessingServer {
             System.exit(1);
         }
 
-        // Attach the leaf managers to the stem.
-        this.stem.addPlantsManager(new PlantEndpointManager(this.controller));
-        this.stem.addAndroidUsersManager(new AndroidUserManager(this.controller));
+        // Attach the leaves managers to the stem.
+        this.stem.addManager(Identity.PLANT_ENDPOINT, new PlantEndpointManager(this.controller));
+        this.stem.addManager(Identity.ANDROID_USER, new AndroidUserManager(this.controller));
     }
 
     public static void main(String[] args) {

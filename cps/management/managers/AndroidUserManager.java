@@ -8,7 +8,7 @@ import cps.database.exceptions.SmartgrowDatabaseException;
 import cps.database.tables.PlantData;
 import cps.management.LeafManager;
 import network.core.Packet;
-import network.core.packets.RequestSensors;
+import network.core.packets.sensors.RequestSensors;
 
 /**
  * AndroidUserManager provides the behaviour for interacting with

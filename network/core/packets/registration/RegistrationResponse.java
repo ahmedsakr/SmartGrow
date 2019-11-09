@@ -1,4 +1,4 @@
-package network.core.packets;
+package network.core.packets.registration;
 
 import java.util.Arrays;
 
@@ -71,9 +71,7 @@ public class RegistrationResponse extends Packet {
      */
     @Override
     protected void extract(byte[] payload) {
-        boolean status = payload[1] == 1 ? true : false;
-        this.setStatus(status);
-
+        this.setStatus(payload[1] == 1);
         this.setRegistrationDetails(super.getString(Arrays.copyOfRange(payload, 2, payload.length)));
     }
 

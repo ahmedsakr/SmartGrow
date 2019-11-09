@@ -7,10 +7,11 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.zip.CRC32;
 
-import network.core.packets.LeafRegistration;
-import network.core.packets.RegistrationResponse;
-import network.core.packets.RequestSensors;
-import network.core.packets.SensorsData;
+import network.core.packets.GenericError;
+import network.core.packets.registration.LeafRegistration;
+import network.core.packets.registration.RegistrationResponse;
+import network.core.packets.sensors.RequestSensors;
+import network.core.packets.sensors.SensorsData;
 import network.core.exceptions.CRCVerificationException;
 import network.core.exceptions.CorruptPacketException;
 import network.core.exceptions.OpCodeNotRecognizedException;
@@ -73,6 +74,16 @@ public abstract class Packet {
     }
 
     /**
+     * Set the target destination ip and port using a NodeLocation object.
+     *
+     * @param leafLocation The NodeLocation containing the IPv4 address and port of the destination
+     */
+    public void setDestination(NodeLocation leafLocation) throws UnknownHostException {
+        this.packet.setAddress(InetAddress.getByName(leafLocation.getIpAddress()));
+        this.packet.setPort(leafLocation.getPort());
+    }
+
+    /**
      * Set the target destination ip and port for this packet.
      * 
      * @param ip The hostname of the recepient
@@ -105,6 +116,9 @@ public abstract class Packet {
                 break;
             case OpCodes.REQUEST_SENSORS:
                 pkt = new RequestSensors();
+                break;
+            case OpCodes.GENERIC_ERROR:
+                pkt = new GenericError();
                 break;
             default:
                 throw new OpCodeNotRecognizedException("Packet OpCode is not recognized");
