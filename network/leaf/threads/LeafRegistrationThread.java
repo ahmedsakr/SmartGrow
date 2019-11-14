@@ -2,9 +2,7 @@ package network.leaf.threads;
 
 import java.io.IOException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
+import logging.SmartLog;
 import network.core.NodeLocation;
 import network.core.Packet;
 import network.core.exceptions.CorruptPacketException;
@@ -23,7 +21,8 @@ import network.leaf.Leaf;
  */
 public class LeafRegistrationThread extends Thread {
 
-    private static Logger logger = LogManager.getLogger(LeafRegistrationThread.class);
+    // The logger instance for this class.
+    private static SmartLog logger = new SmartLog(LeafRegistrationThread.class.getName());
 
     // Maximum amount of registration attempts before giving up.
     private final int REGISTRATION_ATTEMPTS = 3;

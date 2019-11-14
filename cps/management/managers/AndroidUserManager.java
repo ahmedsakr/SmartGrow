@@ -1,12 +1,10 @@
 package cps.management.managers;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import cps.database.DatabaseController;
 import cps.database.exceptions.SmartgrowDatabaseException;
 import cps.database.tables.PlantData;
 import cps.management.LeafManager;
+import logging.SmartLog;
 import network.core.Packet;
 import network.core.packets.sensors.RequestSensors;
 
@@ -20,7 +18,7 @@ import network.core.packets.sensors.RequestSensors;
 public class AndroidUserManager implements LeafManager {
 
     // The logger instance for this class
-    private static Logger logger = LogManager.getLogger(AndroidUserManager.class);
+    private static SmartLog logger = new SmartLog(AndroidUserManager.class.getName());
 
     // Object representation for connecting and updating the database.
     private DatabaseController database;

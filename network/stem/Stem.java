@@ -3,10 +3,8 @@ package network.stem;
 import java.io.IOException;
 import java.net.SocketException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import cps.management.LeafManager;
+import logging.SmartLog;
 import network.branch.Branch;
 import network.core.NodeLocation;
 import network.core.Packet;
@@ -28,7 +26,7 @@ import network.stem.threads.StemListener;
 public class Stem extends Transport {
 
     // The logging handle for this Stem instance.
-    private static Logger logger = LogManager.getLogger(Stem.class);
+    private static SmartLog logger = new SmartLog(Stem.class.getName());
 
     // The StemListener thread for servicing leaves.
     private StemListener stemListener;

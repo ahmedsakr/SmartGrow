@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
+import logging.SmartLog;
 import network.branch.Branch;
 import network.branch.threads.DedicatedLeafServicer;
 
@@ -19,7 +17,8 @@ import network.branch.threads.DedicatedLeafServicer;
  */
 public class LeafPruningThread extends Thread {
 
-    private static Logger logger = LogManager.getLogger(LeafPruningThread.class);
+    // The logger instance for this class.
+    private static SmartLog logger = new SmartLog(LeafPruningThread.class.getName());
 
     // The period at which this thread kicks off to check for pruning validity.
     public static final int LEAF_PRUNING_INTERVAL = 2500;

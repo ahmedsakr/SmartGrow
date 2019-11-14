@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.lang.Runnable;
 import java.net.SocketException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
+import logging.SmartLog;
 import network.branch.Branch;
 import network.core.NodeLocation;
 import network.core.Packet;
@@ -24,7 +22,8 @@ import network.core.packets.registration.RegistrationResponse;
  */
 public class DedicatedLeafServicer extends Transport implements Runnable {
 
-    private static Logger logger = LogManager.getLogger(DedicatedLeafServicer.class);
+    // The logger instance for this class.
+    private static SmartLog logger = new SmartLog(DedicatedLeafServicer.class.getName());
 
     // The thread that this instance runs in.
     private Thread serviceThread;

@@ -2,13 +2,11 @@ package cps;
 
 import java.net.SocketException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import cps.database.DatabaseController;
 import cps.database.exceptions.SmartgrowDatabaseException;
 import cps.management.managers.AndroidUserManager;
 import cps.management.managers.PlantEndpointManager;
+import logging.SmartLog;
 import network.Configuration;
 import network.leaf.Identity;
 import network.stem.Stem;
@@ -23,7 +21,7 @@ import network.stem.Stem;
  */
 public class CentralProcessingServer {
 
-    private static Logger logger = LogManager.getLogger(CentralProcessingServer.class);
+    private static SmartLog logger = new SmartLog(CentralProcessingServer.class.getName());
 
     // The UDP abstraction layer allowing the server to handle multiple leaves
     private Stem stem;

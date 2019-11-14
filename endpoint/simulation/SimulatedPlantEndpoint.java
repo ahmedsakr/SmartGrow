@@ -3,10 +3,8 @@ package endpoint.simulation;
 import java.io.IOException;
 import java.net.SocketException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import endpoint.sensors.SupportedSensors;
+import logging.SmartLog;
 import network.core.packets.sensors.SensorsData;
 import network.leaf.Identity;
 import network.leaf.Leaf;
@@ -21,7 +19,8 @@ import network.leaf.Leaf;
  */
 public class SimulatedPlantEndpoint extends Thread {
 
-    private static Logger logger = LogManager.getLogger(SimulatedPlantEndpoint.class);
+    // The logger instance for this class
+    private static SmartLog logger = new SmartLog(SimulatedPlantEndpoint.class.getName());
 
     // The sinusoidal maxiumum parameters
     private final int SIMULATION_AMPLITUDE_MAX = 3;
@@ -50,6 +49,8 @@ public class SimulatedPlantEndpoint extends Thread {
      */
     public SimulatedPlantEndpoint() throws SocketException {
         super("SimulatedPlantEndpoint");
+
+        // Initialize the leaf for the simulation
         this.leaf = new Leaf(Identity.PLANT_ENDPOINT);
 
         // Initialize random values for simulation amplitude and cycle time.

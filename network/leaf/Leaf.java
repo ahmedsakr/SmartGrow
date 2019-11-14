@@ -3,9 +3,7 @@ package network.leaf;
 import java.io.IOException;
 import java.net.SocketException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
+import logging.SmartLog;
 import network.Configuration;
 import network.core.NodeLocation;
 import network.core.Packet;
@@ -36,7 +34,8 @@ import network.leaf.threads.LeafRegistrationThread;
  */
 public class Leaf extends Transport {
 
-    private static Logger logger = LogManager.getLogger(Leaf.class);
+    // The logging instance for this class.
+    private static SmartLog logger = new SmartLog(Leaf.class.getName());
 
     // The worker responsible for registering us with the server.
     private LeafRegistrationThread worker;
