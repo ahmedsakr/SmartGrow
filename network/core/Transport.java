@@ -7,9 +7,7 @@ import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
+import logging.SmartLog;
 import network.core.exceptions.CorruptPacketException;
 import network.core.exceptions.TransportInterruptedException;
 
@@ -24,10 +22,11 @@ import network.core.exceptions.TransportInterruptedException;
  */
 public class Transport {
 
+    // The logging instance for this class
+    private static SmartLog logger = new SmartLog(Transport.class.getName());
+
     // The default time to wait before timing out on a receive with timeout.
     public static final int RECEIVE_TIMEOUT_MS = 3000;
-
-    private static Logger logger = LogManager.getLogger(Transport.class);
 
     private DatagramSocket socket;
     private NodeLocation destination;

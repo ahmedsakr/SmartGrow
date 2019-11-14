@@ -7,11 +7,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import cps.database.DatabaseInfo;
 import cps.database.exceptions.SmartgrowDatabaseException;
+import logging.SmartLog;
 
 /**
  * DatabaseController provides an abstracted interface to the SmartGrow
@@ -24,7 +22,7 @@ import cps.database.exceptions.SmartgrowDatabaseException;
 public class DatabaseController {
 
     // Initialize the logger instance for this instance.
-    private static Logger logger = LogManager.getLogger(DatabaseController.class);
+    private static SmartLog logger = new SmartLog(DatabaseController.class.getName());
 
     // The database connection for this controller instance.
     private Connection dbConnection;

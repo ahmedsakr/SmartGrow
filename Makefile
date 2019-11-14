@@ -9,8 +9,10 @@ SIMULATION_MAIN=endpoint/simulation/SimulatedPlantEndpoint.java
 SERVER_CLASS=cps.CentralProcessingServer
 SIMULATION_CLASS=endpoint.simulation.SimulatedPlantEndpoint
 
+NETWORK_JAR=${DIST_PATH}/smartgrow-network.jar
+ENDPOINT_JAR=${DIST_PATH}/smartgrow-endpoint.jar
 
-all: clean compile-server compile-simulation
+all: clean compile-server compile-simulation network-library endpoint-library
 
 clean:
 	rm -rf dist
@@ -22,10 +24,17 @@ destroy-database:
 	psql -U "smartgrow_client" -c "DROP DATABASE ${DATABASE_NAME};"
 
 compile-server:
+	mkdir -p dist
 	javac -proc:none -d "${DIST_PATH}" -cp "${JAVA_LIBRARIES}:." ${SERVER_MAIN}
 
 compile-simulation:
 	javac -proc:none -d "${DIST_PATH}" -cp "${JAVA_LIBRARIES}:." ${SIMULATION_MAIN}
+
+network-library:
+	jar cf ${NETWORK_JAR} -C ${DIST_PATH} network
+
+endpoint-library:
+	jar cf ${ENDPOINT_JAR} -C ${DIST_PATH} endpoint/sensors
 
 server: compile-server
 	java -cp "${JAVA_LIBRARIES}:${DIST_PATH}:." ${SERVER_CLASS}

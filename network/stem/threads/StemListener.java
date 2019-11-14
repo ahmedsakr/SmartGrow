@@ -2,9 +2,7 @@ package network.stem.threads;
 
 import java.io.IOException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
+import logging.SmartLog;
 import network.core.NetworkErrors;
 import network.core.NodeLocation;
 import network.core.Packet;
@@ -26,7 +24,7 @@ import network.stem.Stem;
 public class StemListener extends Thread {
 
     // The logger instance for this StemListener instance
-    private static Logger logger = LogManager.getLogger(StemListener.class);
+    private static SmartLog logger = new SmartLog(StemListener.class.getName());
 
     // The stem that this StemListener thread is servicing.
     private Stem stem;

@@ -11,10 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import cps.management.LeafManager;
+import logging.SmartLog;
 
 /**
  * Branch allows for a logical grouping of one or more
@@ -25,7 +23,8 @@ import cps.management.LeafManager;
  */
 public class Branch {
 
-    private static Logger logger = LogManager.getLogger(Branch.class);
+    // The logger instance for this class.
+    private static SmartLog logger = new SmartLog(Branch.class.getName());
 
     // The list of live nodes connected to this stem.
     private ArrayList<DedicatedLeafServicer> servicers;
