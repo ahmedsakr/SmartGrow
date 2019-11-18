@@ -36,8 +36,25 @@ public class SensorsData extends Packet {
      * @param sensorId The well-known id of the sensor
      * @param sensorData The data of that sensor.
      */
-    public void addSensorData(byte sensorId, double sensorData) {
-        this.data.put(sensorId, sensorData);
+    public boolean addSensorData(byte sensorId, double sensorData) {
+        if (sensorId > SupportedSensors.SUPPORTED_SENSORS) {
+            
+            // Unsupported sensors will not be appended to the set of sensor values.
+            return false;
+        } else {
+            this.data.put(sensorId, sensorData);
+            return true;
+        }
+        
+    }
+
+    /**
+     * Retrieve the total number of sensors being stored.
+     *
+     * @return The size of the sensors set
+     */
+    public int getSize() {
+        return this.data.size();
     }
 
     /**
@@ -55,7 +72,13 @@ public class SensorsData extends Packet {
      * @return The sensor data
      */
     public double getSensorData(byte sensorId) {
-        return this.data.get(sensorId);
+        if (this.data.containsKey(sensorId)) {
+            return this.data.get(sensorId);
+        } else {
+
+            // Return -1 if the sensor id is not contained in the sensor values set.
+            return -1.0;
+        } 
     }
 
     /**
