@@ -22,6 +22,9 @@ public class SupportedSensors {
     // Water content in the environment air
     public static final byte AIR_HUMIDITY = 4;
 
+    // The total number of supported sensors.
+    public static final byte SUPPORTED_SENSORS = 4;
+
     /**
      * Provide a string representation for the sensors based on the
      * given id.

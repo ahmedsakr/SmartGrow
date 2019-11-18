@@ -56,6 +56,15 @@ public abstract class Packet {
     }
 
     /**
+     * Retrieve the opcode value of this packet.
+     *
+     * @return The byte value of the opcode for this packet
+     */
+    public byte getOpCode() {
+        return this.data[0];
+    }
+
+    /**
      * Retrieve the packet destination's IP address.
      * 
      * @return IPv4 address of the destination
@@ -178,7 +187,7 @@ public abstract class Packet {
 
         // Calculate the checksum using the payload data and insert it in the
         // last 4 bytes in the array.
-        System.arraycopy(this.computeCRC(), 0, this.data, this.data.length - 4, 4);
+        System.arraycopy(this.computeCRC(), 0, this.data, PACKET_SIZE - 4, 4);
     }
 
     /**
@@ -352,7 +361,6 @@ public abstract class Packet {
         int paddingSize = this.getFreeSpace();
         for (int i = this.size; paddingSize > 0; paddingSize--) {
             this.data[i++] = 0;
-            this.size++;
         }
     }
 }
