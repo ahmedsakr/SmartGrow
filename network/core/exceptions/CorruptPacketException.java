@@ -1,4 +1,4 @@
-package network.core;
+package network.core.exceptions;
 
 /**
  * A CorruptPacketException might result from a few

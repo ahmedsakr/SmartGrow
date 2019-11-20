@@ -1,7 +1,7 @@
-package network.core.packets;
+package network.core.packets.registration;
 
+import network.core.OpCodes;
 import network.core.Packet;
-import network.core.PacketCodes;
 import network.leaf.Identity;
 
 /**
@@ -17,7 +17,7 @@ public class LeafRegistration extends Packet {
     private Identity identity;
 
     public LeafRegistration() {
-        super(PacketCodes.LEAF_REGISTRATION);
+        super(OpCodes.LEAF_REGISTRATION);
     }
 
     /**

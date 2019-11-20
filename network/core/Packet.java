@@ -3,11 +3,18 @@ package network.core;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.zip.CRC32;
 
-import network.core.packets.LeafRegistration;
-import network.core.CorruptPacketException;
+import network.core.packets.GenericError;
+import network.core.packets.registration.LeafRegistration;
+import network.core.packets.registration.RegistrationResponse;
+import network.core.packets.sensors.RequestSensors;
+import network.core.packets.sensors.SensorsData;
+import network.core.exceptions.CRCVerificationException;
+import network.core.exceptions.CorruptPacketException;
+import network.core.exceptions.OpCodeNotRecognizedException;
 
 /**
  * Payloads are expected to follow the form of well-known packets
@@ -49,6 +56,15 @@ public abstract class Packet {
     }
 
     /**
+     * Retrieve the opcode value of this packet.
+     *
+     * @return The byte value of the opcode for this packet
+     */
+    public byte getOpCode() {
+        return this.data[0];
+    }
+
+    /**
      * Retrieve the packet destination's IP address.
      * 
      * @return IPv4 address of the destination
@@ -64,6 +80,16 @@ public abstract class Packet {
      */
     public int getPort() {
         return this.packet.getPort();
+    }
+
+    /**
+     * Set the target destination ip and port using a NodeLocation object.
+     *
+     * @param leafLocation The NodeLocation containing the IPv4 address and port of the destination
+     */
+    public void setDestination(NodeLocation leafLocation) throws UnknownHostException {
+        this.packet.setAddress(InetAddress.getByName(leafLocation.getIpAddress()));
+        this.packet.setPort(leafLocation.getPort());
     }
 
     /**
@@ -88,16 +114,28 @@ public abstract class Packet {
 
         Packet pkt = null;
         switch (payload[0]) {
-            case PacketCodes.LEAF_REGISTRATION:
+            case OpCodes.LEAF_REGISTRATION:
                 pkt = new LeafRegistration();
                 break;
+            case OpCodes.REGISTRATION_RESPONSE:
+                pkt = new RegistrationResponse();
+                break;
+            case OpCodes.SENSORS_DATA:
+                pkt = new SensorsData();
+                break;
+            case OpCodes.REQUEST_SENSORS:
+                pkt = new RequestSensors();
+                break;
+            case OpCodes.GENERIC_ERROR:
+                pkt = new GenericError();
+                break;
             default:
-                throw new CorruptPacketException("Packet OpCode is not recognized");
+                throw new OpCodeNotRecognizedException("Packet OpCode is not recognized");
         }
 
         // Verify the integrity of the packet using the CRC32 checksum
         if (!pkt.verifyPacket(payload)) {
-            throw new CorruptPacketException("CRC check failed");
+            throw new CRCVerificationException("CRC check failed");
         }
 
         pkt.extract(payload);
@@ -149,7 +187,7 @@ public abstract class Packet {
 
         // Calculate the checksum using the payload data and insert it in the
         // last 4 bytes in the array.
-        System.arraycopy(this.computeCRC(), 0, this.data, this.data.length - 4, 4);
+        System.arraycopy(this.computeCRC(), 0, this.data, PACKET_SIZE - 4, 4);
     }
 
     /**
@@ -193,6 +231,23 @@ public abstract class Packet {
     }
 
     /**
+     * Appends a double to the packet.
+     * 
+     * @param value The double value to be stored in the packet
+     */
+    protected void addDouble(double value) {
+        if (this.getFreeSpace() - Double.BYTES < 0) {
+            return;
+        }
+
+        byte[] doubleArray = new byte[Double.BYTES];
+        ByteBuffer.wrap(doubleArray).putDouble(value);
+
+        System.arraycopy(doubleArray, 0, this.data, this.size, Double.BYTES);
+        this.size += Double.BYTES;
+    }
+
+    /**
      * Appends an integer to the packet.
      * 
      * @param value The integer value to be stored in the packet
@@ -226,6 +281,22 @@ public abstract class Packet {
     }
 
     /**
+     * Extracts string from the array by searching for the terminating byte.
+     *
+     * @param array The byte-array containing the characters of the string
+     * @return A string representation of the byte array.
+     */
+    protected String getString(byte[] array) {
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] == (byte)0) {
+                return new String(array, 0, i);
+            }
+        }
+
+        return new String(array, 0, array.length);
+    }
+
+    /**
      * Appends a boolean into the packet.
      * 
      * @param value The boolean being inserted into the packet
@@ -237,6 +308,38 @@ public abstract class Packet {
 
         this.data[size] = value == true ? (byte)1 : (byte)0;
         this.size++;
+    }
+
+    /**
+     * Converts the integer to a Big-Endian byte array.
+     * 
+     * @param value The integer representation of the value
+     */
+    protected byte[] convertIntToBytes(int value) {
+        return new byte[] {
+            (byte)((value >> 24)), (byte)((value >> 16)), (byte)((value >> 8)), (byte)(value)
+        };
+    }
+
+    /**
+     * Converts a Big-Endian byte array to its integer representation.
+     * 
+     * @param array The 4-byte array containing the value of the integer
+     */
+    protected int convertBytesToInt(byte[] array) {
+        return  (int)((array[0] << 24) & 0xFF000000) +
+                (int)((array[1] << 16) & 0x00FF0000) +
+                (int)((array[2] << 8) & 0x0000FF00) +
+                (int)(array[3] & 0xFF);
+    }
+
+    /**
+     * Converts the byte array into a double value.
+     * 
+     * @param array The 8-byte array containing the value of the double
+     */
+    protected double convertBytesToDouble(byte[] array) {
+        return ByteBuffer.wrap(array).getDouble();
     }
 
     /**
@@ -258,26 +361,6 @@ public abstract class Packet {
         int paddingSize = this.getFreeSpace();
         for (int i = this.size; paddingSize > 0; paddingSize--) {
             this.data[i++] = 0;
-            this.size++;
         }
-    }
-
-    /**
-     * Converts the integer to a Big-Endian byte array.
-     */
-    private byte[] convertIntToBytes(int value) {
-        return new byte[] {
-            (byte)((value >> 24)), (byte)((value >> 16)), (byte)((value >> 8)), (byte)(value)
-        };
-    }
-
-    /**
-     * Converts a Big-Endian byte array to its integer representation.
-     */
-    private int convertBytesToInt(byte[] array) {
-        return  (int)((array[0] << 24) & 0xFF000000) +
-                (int)((array[1] << 16) & 0x00FF0000) +
-                (int)((array[2] << 8) & 0x0000FF00) +
-                (int)(array[3] & 0xFF);
     }
 }
