@@ -5,6 +5,8 @@ import java.net.SocketException;
 
 import endpoint.sensors.SupportedSensors;
 import logging.SmartLog;
+import network.core.exceptions.CorruptPacketException;
+import network.core.packets.Acknowledgement;
 import network.core.packets.sensors.SensorsData;
 import network.leaf.Identity;
 import network.leaf.Leaf;
@@ -106,7 +108,16 @@ public class SimulatedPlantEndpoint extends Thread {
 
                 // Dispatch the packet to the server.
                 this.leaf.send(data);
-            } catch (InterruptedException | IOException ex) {
+
+                // Wait for an acknowledgement packet for the sensor packet we sent.
+                if (!(this.leaf.receive() instanceof Acknowledgement)) {
+                    logger.fatal("Received a packet that was not acknowledgement!");
+                    System.exit(1);
+                } else {
+                    logger.info("Received acknowledgement packet from server!");
+                }
+                
+            } catch (InterruptedException | CorruptPacketException | IOException ex) {
                 logger.fatal("Plant endpoint simulation encountered error: " + ex.getMessage());
                 System.exit(1);
             }

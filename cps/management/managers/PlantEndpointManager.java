@@ -6,6 +6,7 @@ import cps.database.tables.PlantData;
 import cps.management.LeafManager;
 import logging.SmartLog;
 import network.core.Packet;
+import network.core.packets.Acknowledgement;
 import network.core.packets.sensors.SensorsData;
 
 /**
@@ -56,6 +57,6 @@ public class PlantEndpointManager implements LeafManager {
 
         // No return value for now: What to do when a plant endpoint
         // gives us values?
-        return null;
+        return new Acknowledgement();
     }
 }

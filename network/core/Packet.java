@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.zip.CRC32;
 
+import network.core.packets.Acknowledgement;
 import network.core.packets.GenericError;
 import network.core.packets.registration.LeafRegistration;
 import network.core.packets.registration.RegistrationResponse;
@@ -128,6 +129,9 @@ public abstract class Packet {
                 break;
             case OpCodes.GENERIC_ERROR:
                 pkt = new GenericError();
+                break;
+            case OpCodes.ACKNOWLEDGEMENT:
+                pkt = new Acknowledgement();
                 break;
             default:
                 throw new OpCodeNotRecognizedException("Packet OpCode is not recognized");
