@@ -47,7 +47,7 @@ public class SensorsDataUnittest {
      * Test: Check that the sensor values can be updated to new values.
      */
     @Test
-    public void updateSensorValues() {
+    public void sensorValuesCanBeUpdated() {
         SensorsData data = new SensorsData();
 
         // Override the sensor values.
@@ -80,7 +80,7 @@ public class SensorsDataUnittest {
      * values in the packet.
      */
     @Test
-    public void clearAllSensorValues() {
+    public void sensorValuesCanBeCleared() {
         SensorsData data = new SensorsData();
 
         data.clear();
