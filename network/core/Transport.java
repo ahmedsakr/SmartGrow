@@ -186,8 +186,9 @@ public class Transport {
 
             // Restore the infinite timeout on this socket before exiting.
             this.socket.setSoTimeout(0);
-            return payload;
         }
+
+        return payload;
     }
 
     /**
