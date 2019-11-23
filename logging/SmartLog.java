@@ -1,6 +1,7 @@
 package logging;
 
-import java.time.LocalTime;
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
 
 /**
  * SmartLog is a lightweight logging library implemented for the purposes of
@@ -115,7 +116,7 @@ public class SmartLog {
         }
 
         System.out.printf(LOG_FORMAT,
-            LocalTime.now(),
+            new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime()),
             Thread.currentThread().getName(),
             getLoggingLevelString(level),
             this.className, message);
