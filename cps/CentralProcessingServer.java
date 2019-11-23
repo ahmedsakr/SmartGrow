@@ -2,12 +2,12 @@ package cps;
 
 import java.net.SocketException;
 
+import config.SmartGrowConfiguration;
 import cps.database.DatabaseController;
 import cps.database.exceptions.SmartgrowDatabaseException;
 import cps.management.managers.AndroidUserManager;
 import cps.management.managers.PlantEndpointManager;
 import logging.SmartLog;
-import network.Configuration;
 import network.leaf.Identity;
 import network.stem.Stem;
 
@@ -47,10 +47,10 @@ public class CentralProcessingServer {
 
     public static void main(String[] args) {
         try {
-            CentralProcessingServer server = new CentralProcessingServer(Configuration.CPS_PORT);
-            logger.info("Successfully initialized cps on port " + Configuration.CPS_PORT);
+            CentralProcessingServer server = new CentralProcessingServer(SmartGrowConfiguration.CPS_PORT);
+            logger.info("Successfully initialized cps on port " + SmartGrowConfiguration.CPS_PORT);
         } catch (SocketException ex) {
-            logger.fatal("Unable to initialize cps on port " + Configuration.CPS_PORT);
+            logger.fatal("Unable to initialize cps on port " + SmartGrowConfiguration.CPS_PORT);
             ex.printStackTrace();
             System.exit(1);
         }

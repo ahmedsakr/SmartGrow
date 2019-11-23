@@ -54,7 +54,7 @@ public class LeafRegistrationThread extends Thread {
         for (int i = 0; i < REGISTRATION_ATTEMPTS; i++) {
 
             // Request registration by sending the LeafRegistration packet
-            logger.info("Sending LeafRegistration packet");
+            logger.info("Sending LeafRegistration packet to " + this.leaf.getDestination());
             leaf.send(registration);
 
             // Wait for a response from the server
