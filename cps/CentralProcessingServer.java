@@ -30,9 +30,19 @@ public class CentralProcessingServer {
     /**
      * Start up the server by initializing its UDP transport layer.
      */
-    public CentralProcessingServer(int port) throws SocketException {
-        this.stem = new Stem(port);
+    public CentralProcessingServer(int port) {
 
+        // Initialize the server on the specified port
+        try {
+            this.stem = new Stem(port);
+        } catch (SocketException ex) {
+            logger.fatal("Unable to initialize cps on port " + SmartGrowConfiguration.CPS_PORT);
+            System.exit(1);
+        }
+
+        logger.info("Successfully initialized cps on port " + SmartGrowConfiguration.CPS_PORT);
+
+        // Establish a connection to the SmartGrow database
         try {
             this.controller = new DatabaseController();
         } catch (SmartgrowDatabaseException ex) {
@@ -45,14 +55,12 @@ public class CentralProcessingServer {
         this.stem.addManager(Identity.ANDROID_USER, new AndroidUserManager(this.controller));
     }
 
+    /**
+     * Main method for creating a CentralProcessingServer instance.
+     *
+     * @param args Run-time arguments (None at the moment)
+     */
     public static void main(String[] args) {
-        try {
-            CentralProcessingServer server = new CentralProcessingServer(SmartGrowConfiguration.CPS_PORT);
-            logger.info("Successfully initialized cps on port " + SmartGrowConfiguration.CPS_PORT);
-        } catch (SocketException ex) {
-            logger.fatal("Unable to initialize cps on port " + SmartGrowConfiguration.CPS_PORT);
-            ex.printStackTrace();
-            System.exit(1);
-        }
+        new CentralProcessingServer(SmartGrowConfiguration.CPS_PORT);
     }
 }
