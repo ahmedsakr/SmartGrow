@@ -47,7 +47,7 @@ public class PlantEndpointManager implements LeafManager {
 
         try {
 
-            // Attempt to append the sensors data to the plant_data table.
+            // Append the sensors data to the plant_data table.
             this.plantsData.insertSensorsData((SensorsData) packet);
 
         } catch (SmartgrowDatabaseException ex) {
@@ -55,8 +55,8 @@ public class PlantEndpointManager implements LeafManager {
             return null;
         }
 
-        // No return value for now: What to do when a plant endpoint
-        // gives us values?
+        // Return an acknowledgement to the plant to inform it of the successful
+        // storage of its values.
         return new Acknowledgement();
     }
 }
