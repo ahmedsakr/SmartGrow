@@ -1,5 +1,5 @@
 // 
-//    FILE: dht11.h
+// FILE: dht11.h
 // VERSION: 0.4.1
 // PURPOSE: DHT11 Temperature & Humidity Sensor library for Arduino
 // LICENSE: GPL v3 (http://www.gnu.org/licenses/gpl.html)

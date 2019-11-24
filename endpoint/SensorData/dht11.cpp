@@ -1,5 +1,5 @@
 //
-//    FILE: dht11.cpp
+// FILE: dht11.cpp
 // VERSION: 0.4.1
 // PURPOSE: DHT11 Temperature & Humidity Sensor library for Arduino
 // LICENSE: GPL v3 (http://www.gnu.org/licenses/gpl.html)
@@ -25,6 +25,7 @@
 // DHTLIB_OK
 // DHTLIB_ERROR_CHECKSUM
 // DHTLIB_ERROR_TIMEOUT
+
 int dht11::read(int pin)
 {
         // BUFFER TO RECEIVE
@@ -40,7 +41,7 @@ int dht11::read(int pin)
         digitalWrite(pin, LOW);
         delay(20);//>=18ms
         digitalWrite(pin, HIGH);
-		pinMode(pin, INPUT);
+		    pinMode(pin, INPUT);
         delayMicroseconds(40);
 
         // ACKNOWLEDGE or TIMEOUT
@@ -55,59 +56,59 @@ int dht11::read(int pin)
         // READ OUTPUT - 40 BITS => 5 BYTES or TIMEOUT
         for (int i=0; i<40; i++)
         {
-                loopCnt = 10000;
-                while(digitalRead(pin) == LOW)
-                        if (loopCnt-- == 0) return DHTLIB_ERROR_TIMEOUT;
-
-                unsigned long t = micros();
-
-                loopCnt = 10000;
-                while(digitalRead(pin) == HIGH)
-                        if (loopCnt-- == 0) return DHTLIB_ERROR_TIMEOUT;
-
-                if ((micros() - t) > 40) bits[idx] |= (1 << cnt);
-                if (cnt == 0)   // next byte?
-                {
-                        cnt = 7;    // restart at MSB
-                        idx++;      // next byte!
-                }
-                else cnt--;
+            loopCnt = 10000;
+            while(digitalRead(pin) == LOW)
+                    if (loopCnt-- == 0) return DHTLIB_ERROR_TIMEOUT;
+    
+            unsigned long t = micros();
+    
+            loopCnt = 10000;
+            while(digitalRead(pin) == HIGH)
+                    if (loopCnt-- == 0) return DHTLIB_ERROR_TIMEOUT;
+    
+            if ((micros() - t) > 40) bits[idx] |= (1 << cnt);
+            if (cnt == 0)   // next byte?
+            {
+                    cnt = 7;    // restart at MSB
+                    idx++;      // next byte!
+            }
+            else cnt--;
         }
 
         // WRITE TO RIGHT VARS
 		
-			humidity=bits[0]*10+bits[1];
-	
-			if(bits[3]&0X80)	//negative temperature
-			{
-				temperature = 0-(bits[2]*10+((bits[3]&0x7F)));
-			}
-			else   //positive temperature
-			{
-				temperature = bits[2]*10+bits[3];
-			}
-			//temperature range：-20℃~60℃，humidity range:5％RH~95％RH
-			if(humidity>950) 
-			{
-			  humidity=950;
-			}
-			if(humidity<50)
-			{
-				humidity=50;
-			}
-			if(temperature>600)
-			{
-			  temperature=600;
-			}
-			if(temperature<-200)
-			{
-				temperature = -200;
-			}
-			temperature = temperature/10;//convert to the real temperature value
-			humidity = humidity/10; //convert to the real humidity value
+  			humidity=bits[0]*10+bits[1];
+  	
+  			if(bits[3]&0X80)	//negative temperature
+  			{
+  				temperature = 0-(bits[2]*10+((bits[3]&0x7F)));
+  			}
+  			else   //positive temperature
+  			{
+  				temperature = bits[2]*10+bits[3];
+  			}
+       
+  			//humidity range:5％RH~95％RH
+  			if(humidity>950){
+  			  humidity=950;
+  			}
+  			if(humidity<50){
+  				humidity=50;
+  			}
 
+        //temperature range：-20℃~60℃，
+  			if(temperature>600){
+  			  temperature=600;
+  			}
+  			if(temperature<-200){
+  				temperature = -200;
+  			}
+       
+  			temperature = temperature/10;//convert to the real temperature value
+  			humidity = humidity/10; //convert to the real humidity value
+
+        //Error checksum
         uint8_t sum = bits[0]+bits[1]+bits[2]+bits[3];  
-
         if (bits[4] != sum) return DHTLIB_ERROR_CHECKSUM;
         return DHTLIB_OK;
 }
