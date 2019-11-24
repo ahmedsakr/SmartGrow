@@ -2,3 +2,16 @@
 *.class
 *.classpath
 dist
+
+*.iml
+application/.gradle
+application/local.properties
+application/.idea/
+application.DS_Store
+application/app/build
+application/captures
+application/.externalNativeBuild
+application/.cxx
+application/.settings
+application/app/.settings
+application/app/libs

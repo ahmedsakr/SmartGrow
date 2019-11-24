@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">SmartGrow</string>
+    <string name="light_intensity_header">Light Intensity</string>
+    <string name="air_temperature_header">Temperature</string>
+    <string name="air_humidity_header">Air Humidity</string>
+    <string name="soil_moisture_header">Soil Moisture</string>
+    <string name="accessibility_description_logo">SmartGrow Logo</string>
+    <string name="light_intensity_placeholder">0</string>
+    <string name="air_humidity_placeholder">0</string>
+    <string name="air_temperature_placeholder">0</string>
+    <string name="soil_moisture_placeholder">0</string>
+    <string name="realtime_header">Real-Time</string>
+</resources>
