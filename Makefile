@@ -14,7 +14,7 @@ ENDPOINT_JAR=${DIST_PATH}/smartgrow-endpoint.jar
 LOGGING_JAR=${DIST_PATH}/smartgrow-logging.jar
 SENSORSDATA_UNITTEST=network/unittests/SensorsDataUnittest.java
 
-all: clean compile-server compile-simulation tests network-library endpoint-library logging-library
+all: clean compile-server compile-simulation tests network-library endpoint-library logging-library install-libraries
 
 clean:
 	@echo "Cleaning the existing build"
@@ -64,3 +64,8 @@ compile-tests:
 tests: compile-tests
 	@echo "Running tests"
 	@java -cp "${JAVA_LIBRARIES}:${DIST_PATH}" org.junit.runner.JUnitCore network.unittests.SensorsDataUnittest
+
+install-libraries:
+	@echo "Installing SmartGrow libraries in android application"
+	@mkdir -p application/app/libs
+	@cp dist/*.jar application/app/libs
