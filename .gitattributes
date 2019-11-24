@@ -1,0 +1,8 @@
+*.gradle -text
+application/settings.gradle -text
+application/build.gradle -text
+application/gradlew -text
+application/gradlew.bat -text
+application/gradel/* -text
+application/app/build.gradle -text
+application/app/proguard-rules.pro
