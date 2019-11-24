@@ -25,6 +25,7 @@
         android:id="@+id/sensorsData"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
         android:background="#E91E63"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -42,7 +43,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/air_temperature_header"
                 android:textColor="#FFFFFF"
-                android:textSize="24sp" />
+                android:textSize="30sp" />
 
             <TextView
                 android:id="@+id/textView3"
@@ -50,7 +51,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/air_humidity_header"
                 android:textColor="#FFFFFF"
-                android:textSize="24sp" />
+                android:textSize="30sp" />
 
         </TableRow>
 
@@ -66,14 +67,16 @@
                 android:layout_height="match_parent"
                 android:layout_marginRight="40dp"
                 android:gravity="center"
-                android:text="@string/air_temperature_placeholder" />
+                android:text="@string/air_temperature_placeholder"
+                android:textSize="24sp" />
 
             <TextView
                 android:id="@+id/textView4"
                 android:layout_width="142dp"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="@string/air_humidity_placeholder" />
+                android:text="@string/air_humidity_placeholder"
+                android:textSize="24sp" />
         </TableRow>
 
         <TableRow
@@ -89,7 +92,7 @@
                 android:layout_marginRight="40dp"
                 android:text="@string/light_intensity_header"
                 android:textColor="#FFFFFF"
-                android:textSize="24sp" />
+                android:textSize="30sp" />
 
             <TextView
                 android:id="@+id/textView7"
@@ -97,7 +100,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/soil_moisture_header"
                 android:textColor="#FFFFFF"
-                android:textSize="24sp" />
+                android:textSize="30sp" />
 
         </TableRow>
 
@@ -113,30 +116,18 @@
                 android:layout_height="match_parent"
                 android:layout_marginRight="40dp"
                 android:gravity="center"
-                android:text="@string/light_intensity_placeholder" />
+                android:text="@string/light_intensity_placeholder"
+                android:textSize="24sp" />
 
             <TextView
                 android:id="@+id/textView8"
                 android:layout_width="142dp"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="@string/soil_moisture_placeholder" />
+                android:text="@string/soil_moisture_placeholder"
+                android:textSize="24sp" />
         </TableRow>
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="10dp"
-            android:gravity="center_horizontal">
-
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal">
-
-        </TableRow>
     </TableLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -65,10 +65,10 @@ public class RealtimeSensors extends Thread {
 
                 // Update the sensor information on the screen
                 activity.runOnUiThread(() -> {
-                    temperature.setText(String.format(Locale.CANADA, "%.1f", data.getSensorData(SupportedSensors.AIR_TEMPERATURE)));
-                    airHumidity.setText(String.format(Locale.CANADA, "%.1f", data.getSensorData(SupportedSensors.AIR_HUMIDITY)));
-                    lightIntensity.setText(String.format(Locale.CANADA, "%.1f", data.getSensorData(SupportedSensors.LIGHT_INTENSITY)));
-                    soilMoisture.setText(String.format(Locale.CANADA, "%.1f", data.getSensorData(SupportedSensors.SOIL_MOISTURE)));
+                    temperature.setText(String.format(Locale.CANADA, "%.1f °C", data.getSensorData(SupportedSensors.AIR_TEMPERATURE)));
+                    airHumidity.setText(String.format(Locale.CANADA, "%.1f %%RH", data.getSensorData(SupportedSensors.AIR_HUMIDITY)));
+                    lightIntensity.setText(String.format(Locale.CANADA, "%.1f Wb", data.getSensorData(SupportedSensors.LIGHT_INTENSITY)));
+                    soilMoisture.setText(String.format(Locale.CANADA, "%.1f Ba", data.getSensorData(SupportedSensors.SOIL_MOISTURE)));
                 });
 
                 // Sleep for a second before requesting another fresh batch of sensors.
