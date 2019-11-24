@@ -1,5 +1,5 @@
 //
-//    FILE: dht11.cpp
+// FILE: dht11.cpp
 // VERSION: 0.4.1
 // PURPOSE: DHT11 Temperature & Humidity Sensor library for Arduino
 // LICENSE: GPL v3 (http://www.gnu.org/licenses/gpl.html)
@@ -56,23 +56,23 @@ int dht11::read(int pin)
         // READ OUTPUT - 40 BITS => 5 BYTES or TIMEOUT
         for (int i=0; i<40; i++)
         {
-                loopCnt = 10000;
-                while(digitalRead(pin) == LOW)
-                        if (loopCnt-- == 0) return DHTLIB_ERROR_TIMEOUT;
-
-                unsigned long t = micros();
-
-                loopCnt = 10000;
-                while(digitalRead(pin) == HIGH)
-                        if (loopCnt-- == 0) return DHTLIB_ERROR_TIMEOUT;
-
-                if ((micros() - t) > 40) bits[idx] |= (1 << cnt);
-                if (cnt == 0)   // next byte?
-                {
-                        cnt = 7;    // restart at MSB
-                        idx++;      // next byte!
-                }
-                else cnt--;
+            loopCnt = 10000;
+            while(digitalRead(pin) == LOW)
+                    if (loopCnt-- == 0) return DHTLIB_ERROR_TIMEOUT;
+    
+            unsigned long t = micros();
+    
+            loopCnt = 10000;
+            while(digitalRead(pin) == HIGH)
+                    if (loopCnt-- == 0) return DHTLIB_ERROR_TIMEOUT;
+    
+            if ((micros() - t) > 40) bits[idx] |= (1 << cnt);
+            if (cnt == 0)   // next byte?
+            {
+                    cnt = 7;    // restart at MSB
+                    idx++;      // next byte!
+            }
+            else cnt--;
         }
 
         // WRITE TO RIGHT VARS
@@ -88,14 +88,15 @@ int dht11::read(int pin)
   				temperature = bits[2]*10+bits[3];
   			}
        
-  			//temperature range：-20℃~60℃，humidity range:5％RH~95％RH
+  			//humidity range:5％RH~95％RH
   			if(humidity>950){
   			  humidity=950;
   			}
   			if(humidity<50){
   				humidity=50;
   			}
-       
+
+        //temperature range：-20℃~60℃，
   			if(temperature>600){
   			  temperature=600;
   			}

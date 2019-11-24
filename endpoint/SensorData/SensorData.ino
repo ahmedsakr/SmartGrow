@@ -15,63 +15,70 @@ double lux = 0;
 int DHTValue = 0;
 
 void setup() {
-  Serial.begin(9600);
+    Serial.begin(9600);
   
-  //configure inputs
-  pinMode(SMSensorPin, INPUT);
-  pinMode(PRPin, INPUT);
-
- 
+    //configure inputs
+    pinMode(SMSensorPin, INPUT);
+    pinMode(PRPin, INPUT);
 }
 
 void loop() {
-
-  //Soil Moisture Value//
+    //Soil Moisture Value//
+    SMSensorValue = analogRead(SMSensorPin); //get soil moisture value
+    //convert moisture value into moisture percentage
+    SMPercent = SMConvertToPercentage(SMSensorValue); 
   
-  SMSensorValue = analogRead(SMSensorPin); //get soil moisture value
-  //convert moisture value into moisture percentage
-  SMPercent = SMConvertToPercentage(SMSensorValue); 
+    //Photoresistor Value//
+    PRValue = analogRead(PRPin); //get photo resistor value
+    //Convert resistor value into lux
+    lux = getLux(PRValue);
   
-  //Photoresistor Value//
-  PRValue = analogRead(PRPin); //get photo resistor value
-  //Convert resistor value into lux
-  lux = getLux(PRValue);
-
-  //DHT Value//
-  DHTValue = DHT.read(DHTPin); //get DHT sensor value
-  switch (DHTValue)
-  {
-    case DHTLIB_OK:  
+    DHTValue = DHT.read(DHTPin); //get DHT sensor value
+  
+    //Cases will determine if the data read is what is expected.
+    //Otherwise it will send an error.
+    switch (DHTValue)
+    {
+      case DHTLIB_OK:  
         Serial.print("OK,\t");
         break;
-    case DHTLIB_ERROR_CHECKSUM: 
-        Serial.print("Checksum error, \t");   
+      case DHTLIB_ERROR_CHECKSUM: 
+        Serial.print("Checksum error, \t");
         break;
-    case DHTLIB_ERROR_TIMEOUT: 
+      case DHTLIB_ERROR_TIMEOUT: 
         Serial.print("Time out error, \t");
         break;
-    default: 
+      default: 
         Serial.print("Unknown error, \t");
         break;
-  }
+    }
 
-  if (lux <= 0){
-    Serial.println("Lux value is not available");
-  }else{
-    Serial.print(lux);
-    Serial.println(" Lux Value");
-  }
+    //Display Values
+    //LIGHT SENSOR
+    if (lux <= 0){
+        Serial.println("Lux value is not available");
+    }else{
+        Serial.print(lux);
+        Serial.println(" Lux Value");
+    }
+    //TEMPERATURE
+    if (DHT.temperature > 60 | DHT.temperature < -20){
+        Serial.println("Temperature is not within the sensor's range. Reading will not be accurate.");
+    }
+    Serial.print(DHT.temperature);
+    Serial.println(" Temperature Level");
+    //HUMIDITY
+    if (DHT.humidity > 95 | DHT.humidity < 5){
+        Serial.println("Humidity is not within the sensor's range. Reading will not be accurate.");
+    }
+    Serial.print(DHT.humidity);
+    Serial.println(" Humidity Level");
+    //SOIL MOISTURE
+    Serial.println(SMPercent);
+    Serial.println("% Moisture Level");
+    Serial.println("END");
   
-
-  Serial.print(SMSensorValue);
-  Serial.println(" Moisture Level");
-  Serial.print(DHT.humidity);
-  Serial.println(" Humidity Level");
-  Serial.print(DHT.temperature);
-  Serial.println(" Temperature Level");
-  Serial.println("END");
-
-  delay(DELAY);
+    delay(DELAY);
 }
 
 /*Returns the soil moisture percentge given the analog input from the soil moisture sensor
