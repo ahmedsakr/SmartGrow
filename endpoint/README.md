@@ -1,6 +1,10 @@
 **Plant Endpoint**
 ==
-![Hardware Schematic](./smartgrow-hardware-schematic.jpg)
 
+![Hardware Schematic](./smartgrow-hardware-schematic.jpg)
 --
+
+![Hardware](./smartgrow-hardware-breadboard.jpg)
+--
+
 The **Plant Endpoint** system is set of components responsible for extracting and delivering sensory information to the central processing server.
