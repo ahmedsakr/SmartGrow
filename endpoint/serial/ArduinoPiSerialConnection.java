@@ -73,7 +73,7 @@ public class ArduinoPiSerialConnection extends Thread {
 
 			//Notifies if there's data available
 			serialPort.addEventListener(new SerialReader(in));
-            serialPort.notifyOnDataAvailable(true);
+            		serialPort.notifyOnDataAvailable(true);
 			
 		}else{
 			//gives an error if port is not serial
@@ -97,7 +97,7 @@ public class ArduinoPiSerialConnection extends Thread {
 			int len = -1;
 			try {
 				while( ( len = this.in.read( buffer ) ) > -1 ) {
-				  System.out.print( new String( buffer, 0, len ) );
+				 	System.out.print( new String( buffer, 0, len ) );
 				}
 			} catch(IOException e) {
 				e.printStackTrace();
@@ -118,21 +118,21 @@ public class ArduinoPiSerialConnection extends Thread {
 				
 				/*
 				data.addSensorData(SupportedSensors.AIR_HUMIDITY, getSimulatedValue(this.AIR_HUMIDITY_START));
-                data.addSensorData(SupportedSensors.AIR_TEMPERATURE, getSimulatedValue(this.AIR_TEMPERATURE_START));
-                data.addSensorData(SupportedSensors.LIGHT_INTENSITY, getSimulatedValue(this.LIGHT_INTENSITY_START));
-                data.addSensorData(SupportedSensors.SOIL_MOISTURE, getSimulatedValue(this.SOIL_MOISTURE_START));
+				data.addSensorData(SupportedSensors.AIR_TEMPERATURE, getSimulatedValue(this.AIR_TEMPERATURE_START));
+				data.addSensorData(SupportedSensors.LIGHT_INTENSITY, getSimulatedValue(this.LIGHT_INTENSITY_START));
+				data.addSensorData(SupportedSensors.SOIL_MOISTURE, getSimulatedValue(this.SOIL_MOISTURE_START));
 				*/
 				
 				// Dispatch the packet to the server.
-                this.leaf.send(data);
+				this.leaf.send(data);
 
-                // Wait for an acknowledgement packet for the sensor packet we sent.
-                if (!(this.leaf.receive() instanceof Acknowledgement)) {
-                    logger.fatal("Received a packet that was not acknowledgement!");
-                    System.exit(1);
-                } else {
-                    logger.info("Received acknowledgement packet from server!");
-                }
+				// Wait for an acknowledgement packet for the sensor packet we sent.
+				if (!(this.leaf.receive() instanceof Acknowledgement)) {
+				    logger.fatal("Received a packet that was not acknowledgement!");
+				    System.exit(1);
+				} else {
+				    logger.info("Received acknowledgement packet from server!");
+				}
 			} catch (IOException | CorruptPacketException |InterruptedException e) {
 				e.printStackTrace();
 				System.exit(1);
@@ -146,11 +146,10 @@ public class ArduinoPiSerialConnection extends Thread {
 			//connection will ideally connect the pi and the arduino through the correct port
 			ArduinoPiSerialConnection apsc = new ArduinoPiSerialConnection();
 			apsc.SerialConnection("COM10");
-		}catch(Exception e){
+		} catch(Exception e){
 			e.printStackTrace();
 		}
 	}
 }
 
 	//TODO: Recieve info from Arduino
-	//TODO: Package sensor info
