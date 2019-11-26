@@ -1,6 +1,5 @@
 /**
-Code by: Johannes Eickhold
-https://eclipsesource.com/blogs/2012/10/17/serial-communication-in-java-with-raspberry-pi-and-rxtx/
+Code from: http://rxtx.qbang.org/wiki/index.php/Two_way_communcation_with_the_serial_port
  Edited by:
  @author Valerie Figuracion
 
@@ -10,15 +9,15 @@ https://eclipsesource.com/blogs/2012/10/17/serial-communication-in-java-with-ras
  *SensorsData.ino on the Arduino
  **/
 
-package endpoint;
+package endpoint.serial;
 
-//import com.pi4j.io.serial.*;
-
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
-//import javax.comm.*;//RXTX bs
 
-import gnu.io.*;
+import gnu.io.CommPort;
+import gnu.io.CommPortIdentifier;
+import gnu.io.SerialPort;
 
 import network.*;
 import logging.SmartLog;
@@ -27,8 +26,10 @@ public class ArduinoPiSerialConnection extends Thread {
 
 	//Creates a logger instance for the class
 	private SmartLog logger = new SmartLog(ArduinoPiSerialConnection.class.getName());
+
+	public ArduinoPiSerialConnection(){ super(); }
 		
-	//Method
+	//Opens the connection between the Arduino and the Pi
 	public void SerialConnection(String portName) throws Exception{
 		
 		//Initializes the port for the serial connection.
@@ -51,12 +52,14 @@ public class ArduinoPiSerialConnection extends Thread {
 			
 			//Initializes input stream for the serial port (so the arduino can send data to the Pi)
 			InputStream in = serialPort.getInputStream();
-			//Notifies if there's data available
-			serialPort.notifyOnDataAvailable(true);
-
+			
 			//SerialReader thread starts
 			SerialReader sr = new SerialReader(in);
 			new Thread(sr).start();
+
+			//Notifies if there's data available
+			serialPort.addEventListener(new SerialReader(in));
+            serialPort.notifyOnDataAvailable(true);
 			
 		}else{
 			//gives an error if port is not serial
@@ -112,9 +115,9 @@ public class ArduinoPiSerialConnection extends Thread {
 	//Main method so it can do stuff
 	public static void main(String[] args){
 		try{
-			//connection will ideally connect the pi and the arduino through /dev/ttyAMA0
-			ArduinoPiSerialConnection APSC = new ArduinoPiSerialConnection();
-			APSC.SerialConnection("/dev/ttyAMA0");
+			//connection will ideally connect the pi and the arduino through the correct port
+			ArduinoPiSerialConnection apsc = new ArduinoPiSerialConnection();
+			apsc.SerialConnection("COM10");
 		}catch(Exception e){
 			e.printStackTrace();
 		}
