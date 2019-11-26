@@ -19,3 +19,8 @@ CREATE TABLE plant_data(
     air_temperature NUMERIC,
     soil_moisture NUMERIC
 );
+
+CREATE TABLE leaf_accounts(
+    leaf_id NUMERIC PRIMARY KEY,
+    macAddress TEXT
+);

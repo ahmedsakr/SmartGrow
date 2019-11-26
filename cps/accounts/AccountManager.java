@@ -1,6 +1,7 @@
 package cps.accounts;
 
 import logging.SmartLog;
+import util.MACAddress;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -9,6 +10,8 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Scanner;
+
+import cps.database.tables.LeafAccounts;
 
 /**
  * AccountManager provides the SmartGrow server with an ability
@@ -25,7 +28,9 @@ public class AccountManager {
 
     // The ARP command for deriving all MAC address entries for IPs
     private static final String ARP_COMMAND = "arp -a";
-    private static final int MAC_ADDRESS_LENGTH = 6;
+
+    // The LeafAccounts table wrapper
+    private LeafAccounts leafAccounts;
 
     // Local addresses obtained from all discovered interfaces on the machine.
     private ArrayList<String> localAddresses;
@@ -35,10 +40,24 @@ public class AccountManager {
      *
      * @throws SocketException
      */
-    public AccountManager() throws SocketException {
+    public AccountManager(LeafAccounts leafAccounts) throws SocketException {
+
+        this.leafAccounts = leafAccounts;
 
         // Discover all addresses on interfaces registered on this machine
         this.indexLocalAddresses();
+    }
+
+    /**
+     * Check if the leaf identified by the IPv4 address already has an account
+     * with SmartGrow.
+     *
+     * @param address The IPv4 address of the leaf
+     * @return      true    if the leaf already has an account
+     *              false   Otherwise
+     */
+    public boolean accountExists(String address) throws IOException {
+        return this.leafAccounts.getLeafId(this.getMACAddress(address)) != -1;
     }
 
     /**
@@ -46,14 +65,20 @@ public class AccountManager {
      * through the specified address.
      *
      * @param address The IPv4 address of the device
-     * @return
+     * @return A string representation of the MAC address
      * @throws SocketException
      */
-    public byte[] getMACAddress(String address) throws IOException {
+    private String getMACAddress(String address) throws IOException {
 
         // Use the NetworkInterface class if the address is a local one (i.e., on the same machine)
         if (this.localAddresses.contains(address)) {
-            return NetworkInterface.getByInetAddress(InetAddress.getByName(address)).getHardwareAddress();
+            byte[] macAddr = NetworkInterface.getByInetAddress(InetAddress.getByName(address)).getHardwareAddress();
+
+            if (macAddr == null) {
+                return null;
+            } else {
+                return MACAddress.convertMacAddressToString(macAddr);
+            }
         }
         
         /*
@@ -71,7 +96,7 @@ public class AccountManager {
 
                 // Return the MAC address of the matched ARP entry
                 if (arpLine.contains(address)) {
-                    return this.convertMACAddressToByteArray(arpLine.split(" ")[3]);
+                    return arpLine.split(" ")[3];
                 }
             }
         }
@@ -95,32 +120,11 @@ public class AccountManager {
          */
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         while (interfaces.hasMoreElements()) {
-            
+
             Enumeration<InetAddress> addresses = interfaces.nextElement().getInetAddresses();
             while (addresses.hasMoreElements()) {
                 this.localAddresses.add(addresses.nextElement().getHostName());
             }
         }
-    }
-
-    /*
-     * Convert a string MAC address to its byte equivalent.
-     */
-    private byte[] convertMACAddressToByteArray(String macAddress) {
-        byte[] result = new byte[MAC_ADDRESS_LENGTH];
-
-        String[] values = macAddress.split(":");
-        if (values.length == MAC_ADDRESS_LENGTH) {
-            for (int i = 0; i < values.length; i++) {
-                result[i] = (byte)Integer.parseInt(values[i], 16);
-            }
-        } else {
-
-            // This is not normal: Whoever called this function screwed up.
-            logger.error("Mac address provided does not contain 6 values!");
-            return null;
-        }
-
-        return result;
     }
 }
