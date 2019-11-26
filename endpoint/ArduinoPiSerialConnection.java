@@ -29,166 +29,99 @@ import logging.SmartLog;
 
 public class ArduinoPiSerialConnection extends Thread {
 
-	//logger instance for the class
+	//Creates a logger instance for the class
 	private SmartLog logger = new SmartLog(ArduinoPiSerialConnection.class.getName());
-
-	public ArduinoPiSerialConnection (Packet packet) throws Exception{
-		this.packet = packet;
-
-		CommPortIdentifier portID = CommPortIdentifier.getPortIdentifier( "/dev/ttyAMA0" );
-		CommPort port = portID.open( this.getClass().getName(), 1000 );
-
-		if( port instanceof SerialPort ) {
-		SerialPort serialPort = ( SerialPort )port;
-		serialPort.setSerialPortParams( 9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE );
 		
-		InputStream in = serialPort.getInputStream();
-		serialPort.notifyOnDataAvailable( true );
+	//Method
+	public ArduinoPiSerialConnection(String portName) throws Exception{
+		
+		//Initializes the port for the serial connection.
+		CommPortIdentifier portID = CommPortIdentifier.getPortIdentifier(portName);
+		
+		//Will determine if it is already in use or not
+		if( portID.isCurrentlyOwned() ) {
+			logger.error("Error: Port is currently in use");
+		}else {
+			int timeout = 2000;
+			//Opens the port of the serial connection (RPi or Arduino?)
+			CommPort port = portID.open(this.getClass().getName(), timeout);
+		}
+		
+		//SerialPort is subclass of CommPort. Will initialize if CommPort is a SerialPort.
+		if(port instanceof SerialPort) {
+			SerialPort serialPort = (SerialPort)port; //Masks CommPort into SerialPort
+			//Initialize parameters for the SerialPort (on Arduino I think)
+			serialPort.setSerialPortParams(9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE );
+			
+			//Initializes input stream for the serial port (so the arduino can send data to the Pi)
+			InputStream in = serialPort.getInputStream();
+			//Notifies if there's data available
+			serialPort.notifyOnDataAvailable(true);
 
-		( new Thread( new SerialReader( in ) ) ).start();
+			//SerialReader thread starts
+			(new Thread(new SerialReader(in))).start();
+			
+		}else{
+			//gives an error if port is not serial
+			logger.error("Error: Must be a serial port");
 		}
 	}
 
+	//Serial reader allows the Pi to receive data from the arduino (hopefully)
 	public static class SerialReader implements Runnable {
 
 		InputStream in;
-
-		public SerialReader( InputStream in ) {
-		  this.in = in;
+		
+		//Method
+		public SerialReader(InputStream in) {
+			this.in = in;
 		}
 
+		//(Does this need to be overriden? I think there's already a method I can call. I have to find it though)
 		public void run() {
-		  byte[] buffer = new byte[ 1024 ];
-		  int len = -1;
-		  try {
+			byte[] buffer = new byte[ 1024 ];
+			int len = -1;
+			try {
 			while( ( len = this.in.read( buffer ) ) > -1 ) {
 			  System.out.print( new String( buffer, 0, len ) );
 			}
-		  } catch( IOException e ) {
+			} catch(IOException e) {
 			e.printStackTrace();
-		  }
+			}
 		}
 	}
-
+	
+	//Run method of the thread
 	@Override
 	public void run(){
+		
+		//Initialize Leaf (port?)
+		try {
+			private Leaf leaf = new Leaf(Identity.PLANT_ENDPOINT);
 
-	try {
-        private Leaf leaf = new Leaf(Identity.PLANT_ENDPOINT);
-
-		while(true){
-			SensorsData data = (SensorsData) leaf.receive();
-
-			SerialReader.sleep(1000);
-		}
-
-
+			//Get information from SerialReader (I think?)
+			while(true){
+				SensorsData data = (SensorsData) leaf.receive();
+				SerialReader.sleep(1000);
+			}
 		} catch (SocketException | IOException | CorruptPacketException |InterruptedException e) {
 			logger.fatal(e);
 		} finally{
+			//close leaf
 			leaf.close();
 		}
 	}
 
+	//Main method so it can do stuff
+	public static void main(String[] args) {
+		try {
+			//connection will ideally connect the pi and the arduino through /dev/ttyAMA0
+		  ( new ArduinoPiSerialConnection() ).ArduinoPiSerialConnection( "/dev/ttyAMA0" );
+		} catch( Exception e ) {
+		  e.printStackTrace();
+		}
+	}
 
-	public static void main( String[] args ) {
-    try {
-      ( new ArduinoPiSerialConnection() ).connect( "/dev/ttyAMA0" );
-    } catch( Exception e ) {
-      e.printStackTrace();
-    }
-  }
-
-
-
-
-
-
-
-
-
-
-	
-    /**
-     * @param args
-     * @throws InterruptedException
-     * @throws IOException
-     */
-    public static void main(String args[]) throws InterruptedException, IOException {
-
-        // !! ATTENTION !!
-        // By default, the serial port is configured as a console port
-        // for interacting with the Linux OS shell.  If you want to use
-        // the serial port in a software program, you must disable the
-        // OS from using this port.
-        //
-        // Please see this blog article for instructions on how to disable
-        // the OS console for this port:
-        // https://www.cube-controls.com/2015/11/02/disable-serial-port-terminal-output-on-raspbian/
-
-        // create Pi4J console wrapper/helper
-        // (This is a utility class to abstract some of the boilerplate code)
-        final Console console = new Console();
-
-        // print program title/header
-        console.title("Plant Endpoint Sensors");
-
-        // allow for user to exit program using CTRL-C
-        console.promptForExit();
-
-		Leaf leaf;
-
-		leaf.recieve(); 
-		
-        
-
-
-
-
-        try {
-            
-            }
-
-           
-
-            // continuous loop to keep the program running until the user terminates the program
-            while(console.isRunning()) {
-                try {
-                    // write a formatted string to the serial transmit buffer
-                    serial.write("CURRENT TIME: " + new Date().toString());
-
-                    // write a individual bytes to the serial transmit buffer
-                    serial.write((byte) 13);
-                    serial.write((byte) 10);
-
-                    // write a simple string to the serial transmit buffer
-                    serial.write("Second Line");
-
-                    // write a individual characters to the serial transmit buffer
-                    serial.write('\r');
-                    serial.write('\n');
-
-                    // write a string terminating with CR+LF to the serial transmit buffer
-                    serial.writeln("Third Line");
-                }
-                catch(IllegalStateException ex){
-                    ex.printStackTrace();
-                }
-
-                // wait 1 second before continuing
-                Thread.sleep(1000);
-            }
-
-        }
-        catch(IOException ex) {
-            console.println(" ==>> SERIAL SETUP FAILED : " + ex.getMessage());
-            return;
-        }
-    }
-
-	//Recieve info from Arduino
-	//Package sensor info
-
-
-
+	//TODO: Recieve info from Arduino
+	//TODO: Package sensor info
 }
