@@ -3,8 +3,9 @@ package network.leaf;
 import java.io.IOException;
 import java.net.SocketException;
 
+import config.SmartGrowConfiguration;
 import logging.SmartLog;
-import network.Configuration;
+
 import network.core.NodeLocation;
 import network.core.Packet;
 import network.core.Transport;
@@ -50,7 +51,7 @@ public class Leaf extends Transport {
      * @param identity The identity of this leaf (Android user or Plant endpoint)
      */
     public Leaf(Identity identity, int port) throws SocketException {
-        super(new NodeLocation(Configuration.CPS_ADDRESS, Configuration.CPS_PORT), port);
+        super(new NodeLocation(SmartGrowConfiguration.CPS_ADDRESS, SmartGrowConfiguration.CPS_PORT), port);
         
         this.identity = identity;
         this.worker = new LeafRegistrationThread(this);
@@ -62,7 +63,7 @@ public class Leaf extends Transport {
      * @param identity The identity of this leaf (Android user or Plant endpoint)
      */
     public Leaf(Identity identity) throws SocketException {
-        super(new NodeLocation(Configuration.CPS_ADDRESS, Configuration.CPS_PORT));
+        super(new NodeLocation(SmartGrowConfiguration.CPS_ADDRESS, SmartGrowConfiguration.CPS_PORT));
 
         this.identity = identity;
         this.worker = new LeafRegistrationThread(this);

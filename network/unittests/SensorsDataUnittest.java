@@ -24,7 +24,7 @@ public class SensorsDataUnittest {
         SensorsData data = new SensorsData();
 
         // Check that the opcode of the SensorsData packet is the expected one
-        assertEquals(data.getOpCode(), OpCodes.SENSORS_DATA);
+        assertEquals(OpCodes.SENSORS_DATA, data.getOpCode());
     }
 
     /**
@@ -37,10 +37,10 @@ public class SensorsDataUnittest {
         SensorsData data = new SensorsData();
 
         // Check that all sensors are initialized to -1
-        assertEquals(data.getSensorData(SupportedSensors.LIGHT_INTENSITY), -1.0, 0.01);
-        assertEquals(data.getSensorData(SupportedSensors.SOIL_MOISTURE), -1.0, 0.01);
-        assertEquals(data.getSensorData(SupportedSensors.AIR_TEMPERATURE), -1.0, 0.01);
-        assertEquals(data.getSensorData(SupportedSensors.AIR_HUMIDITY), -1.0, 0.01);
+        assertEquals(-1.0, data.getSensorData(SupportedSensors.LIGHT_INTENSITY), 0.001); 
+        assertEquals(-1.0, data.getSensorData(SupportedSensors.SOIL_MOISTURE), 0.001);
+        assertEquals(-1.0, data.getSensorData(SupportedSensors.AIR_TEMPERATURE), 0.001);
+        assertEquals(-1.0, data.getSensorData(SupportedSensors.AIR_HUMIDITY), 0.001);
     }
 
     /**
@@ -57,10 +57,10 @@ public class SensorsDataUnittest {
         data.addSensorData(SupportedSensors.AIR_HUMIDITY, 8.0);
 
         // Check that the sensor values were overriden correctly.
-        assertEquals(data.getSensorData(SupportedSensors.LIGHT_INTENSITY), 5.0, 0.01);
-        assertEquals(data.getSensorData(SupportedSensors.SOIL_MOISTURE), 6.0, 0.01);
-        assertEquals(data.getSensorData(SupportedSensors.AIR_TEMPERATURE), 7.0, 0.01);
-        assertEquals(data.getSensorData(SupportedSensors.AIR_HUMIDITY), 8.0, 0.01);
+        assertEquals(5.0, data.getSensorData(SupportedSensors.LIGHT_INTENSITY), 0.001);
+        assertEquals(6.0, data.getSensorData(SupportedSensors.SOIL_MOISTURE), 0.001);
+        assertEquals(7.0, data.getSensorData(SupportedSensors.AIR_TEMPERATURE), 0.001);
+        assertEquals(8.0, data.getSensorData(SupportedSensors.AIR_HUMIDITY), 0.001);
     }
 
     /**
@@ -72,7 +72,7 @@ public class SensorsDataUnittest {
         SensorsData data = new SensorsData();
         
         // Check that the 4 default sensors are available in the data packet at creation.
-        assertEquals(data.getSize(), SupportedSensors.SUPPORTED_SENSORS); 
+        assertEquals(SupportedSensors.SUPPORTED_SENSORS, data.getSize()); 
     }
 
     /**
@@ -86,7 +86,7 @@ public class SensorsDataUnittest {
         data.clear();
 
         // Check that the clear operation emptied the set of sensor values.
-        assertEquals(data.getSize(), 0);
+        assertEquals(0, data.getSize());
     }
 
     /**
@@ -97,10 +97,10 @@ public class SensorsDataUnittest {
         SensorsData data = new SensorsData();
 
         // Try to add an unsupported sensor id to the sensor values set.
-        assertEquals(data.addSensorData((byte)10, 5.0), false);
+        assertEquals(false, data.addSensorData((byte)10, 5.0));
 
         // Confirm that the size of sensor values sets remains 4.
-        assertEquals(data.getSize(), 4);
+        assertEquals(SupportedSensors.SUPPORTED_SENSORS, data.getSize());
     }
 
     /**
@@ -112,7 +112,7 @@ public class SensorsDataUnittest {
         SensorsData data = new SensorsData();
 
         // Try to add an unsupported sensor id to the sensor values set.
-        assertEquals(data.getSensorData((byte)10), -1.0, 0.01);
+        assertEquals(-1.0, data.getSensorData((byte)10), 0.001);
     }
 
     /**
@@ -129,13 +129,13 @@ public class SensorsDataUnittest {
         int freeBeforeAddition = data.getFreeSpace();
         
         // Add the sensor value
-        assertEquals(data.addSensorData(SupportedSensors.LIGHT_INTENSITY, 5), true);
+        assertEquals(true, data.addSensorData(SupportedSensors.LIGHT_INTENSITY, 5));
         
         // Compute the free space in the packet after adding a sensor value.
         data.compile();
         int freeAfterAddition = data.getFreeSpace();
 
         // The difference should be 9 bytes: 1 byte for the sensor id + 8 bytes for the sensor value
-        assertEquals(freeBeforeAddition - freeAfterAddition, 9);
+        assertEquals(9, freeBeforeAddition - freeAfterAddition);
     }
 }
