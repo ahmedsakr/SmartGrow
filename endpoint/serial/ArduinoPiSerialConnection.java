@@ -1,35 +1,52 @@
 /**
-Code by: Johannes Eickhold
-https://eclipsesource.com/blogs/2012/10/17/serial-communication-in-java-with-raspberry-pi-and-rxtx/
+Code from: http://rxtx.qbang.org/wiki/index.php/Two_way_communcation_with_the_serial_port
  Edited by:
  @author Valerie Figuracion
 
+gnu.io library from http://rxtx.qbang.org to replace javax.comm
  
 /*RaspPi-Arduino Serial Communication
  *ArduinoPiSerialConnection.java on the RPi
  *SensorsData.ino on the Arduino
  **/
 
-package endpoint;
+package endpoint.serial;
 
-//import com.pi4j.io.serial.*;
+import endpoint.sensors.SupportedSensors;
 
-import java.io.*;
+
+import gnu.CommPort;
+import gnu.io.CommPortIdentifier;
+import gnu.io.SerialPort;
+import gnu.io.SerialPortEvent;
+import gnu.io.SerialPortEventListener;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.SocketException;
 import java.util.*;
-//import javax.comm.*;//RXTX bs
 
-import gnu.io.*;
-
-import network.*;
 import logging.SmartLog;
+
+import network.core.exceptions.CorruptPacketException;
+import network.core.packets.Acknowledgement;
+import network.core.packets.sensors.SensorsData;
+import network.leaf.Identity;
+import network.leaf.Leaf;
 
 public class ArduinoPiSerialConnection extends Thread {
 
 	//Creates a logger instance for the class
 	private SmartLog logger = new SmartLog(ArduinoPiSerialConnection.class.getName());
+
+	private Leaf leaf;
+	
+	public ArduinoPiSerialConnection(){ super("ArduinoPiSerialConnection"); }
 		
-	//Method
+	//Opens the connection between the Arduino and the Pi
 	public void SerialConnection(String portName) throws Exception{
+		
+		this.leaf = new Leaf(Identity.PLANT_ENDPOINT);
 		
 		//Initializes the port for the serial connection.
 		CommPortIdentifier portID = CommPortIdentifier.getPortIdentifier(portName);
@@ -51,12 +68,14 @@ public class ArduinoPiSerialConnection extends Thread {
 			
 			//Initializes input stream for the serial port (so the arduino can send data to the Pi)
 			InputStream in = serialPort.getInputStream();
-			//Notifies if there's data available
-			serialPort.notifyOnDataAvailable(true);
-
+			
 			//SerialReader thread starts
 			SerialReader sr = new SerialReader(in);
 			new Thread(sr).start();
+
+			//Notifies if there's data available
+			serialPort.addEventListener(new SerialReader(in));
+            serialPort.notifyOnDataAvailable(true);
 			
 		}else{
 			//gives an error if port is not serial
@@ -92,29 +111,43 @@ public class ArduinoPiSerialConnection extends Thread {
 	@Override
 	public void run(){
 		
-		//Initialize Leaf (port?)
-		try {
-			Leaf leaf = new Leaf(Identity.PLANT_ENDPOINT);
-
-			//Get information from SerialReader (I think?)
-			while(true){
-				SensorsData data = (SensorsData) leaf.receive();
+		while(true) {
+			SensorsData data = new SensorsData();
+			
+			try {
 				SerialReader.sleep(1000);
-			}
-		} catch (SocketException | IOException | CorruptPacketException |InterruptedException e) {
-			logger.fatal(e);
-		} finally {
-			//close leaf
-			leaf.close();
+				data.clear();
+				
+				/*
+				data.addSensorData(SupportedSensors.AIR_HUMIDITY, getSimulatedValue(this.AIR_HUMIDITY_START));
+                data.addSensorData(SupportedSensors.AIR_TEMPERATURE, getSimulatedValue(this.AIR_TEMPERATURE_START));
+                data.addSensorData(SupportedSensors.LIGHT_INTENSITY, getSimulatedValue(this.LIGHT_INTENSITY_START));
+                data.addSensorData(SupportedSensors.SOIL_MOISTURE, getSimulatedValue(this.SOIL_MOISTURE_START));
+				*/
+				
+				// Dispatch the packet to the server.
+                this.leaf.send(data);
+
+                // Wait for an acknowledgement packet for the sensor packet we sent.
+                if (!(this.leaf.receive() instanceof Acknowledgement)) {
+                    logger.fatal("Received a packet that was not acknowledgement!");
+                    System.exit(1);
+                } else {
+                    logger.info("Received acknowledgement packet from server!");
+                }
+			} catch (IOException | CorruptPacketException |InterruptedException e) {
+				e.printStackTrace();
+				System.exit(1);
+			} 
 		}
 	}
 
 	//Main method so it can do stuff
 	public static void main(String[] args){
 		try{
-			//connection will ideally connect the pi and the arduino through /dev/ttyAMA0
-			ArduinoPiSerialConnection APSC = new ArduinoPiSerialConnection();
-			APSC.SerialConnection("/dev/ttyAMA0");
+			//connection will ideally connect the pi and the arduino through the correct port
+			ArduinoPiSerialConnection apsc = new ArduinoPiSerialConnection();
+			apsc.SerialConnection("COM10");
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -123,4 +156,3 @@ public class ArduinoPiSerialConnection extends Thread {
 
 	//TODO: Recieve info from Arduino
 	//TODO: Package sensor info
-
