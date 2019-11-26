@@ -12,6 +12,7 @@ gnu.io library from http://rxtx.qbang.org to replace javax.comm
 
 package endpoint.serial;
 
+<<<<<<< HEAD
 import endpoint.sensors.SupportedSensors;
 
 
@@ -25,6 +26,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketException;
 import java.util.*;
+=======
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.*;
+
+import gnu.io.CommPort;
+import gnu.io.CommPortIdentifier;
+import gnu.io.SerialPort;
+>>>>>>> 57215ddb8608419f17aa6ec1a8150093328bd29f
 
 import logging.SmartLog;
 
@@ -39,9 +49,13 @@ public class ArduinoPiSerialConnection extends Thread {
 	//Creates a logger instance for the class
 	private SmartLog logger = new SmartLog(ArduinoPiSerialConnection.class.getName());
 
+<<<<<<< HEAD
 	private Leaf leaf;
 	
 	public ArduinoPiSerialConnection(){ super("ArduinoPiSerialConnection"); }
+=======
+	public ArduinoPiSerialConnection(){ super(); }
+>>>>>>> 57215ddb8608419f17aa6ec1a8150093328bd29f
 		
 	//Opens the connection between the Arduino and the Pi
 	public void SerialConnection(String portName) throws Exception{
