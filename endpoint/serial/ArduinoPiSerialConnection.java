@@ -1,35 +1,27 @@
 /**
- * This file is part of the Pi4J project. More information about
- * this project can be found here:  https://www.pi4j.com/
- Code made by:
- https://github.com/Pi4J/pi4j/tree/master/pi4j-example/src/main/java/SerialExample.java
-
+Code by: Johannes Eickhold
+https://eclipsesource.com/blogs/2012/10/17/serial-communication-in-java-with-raspberry-pi-and-rxtx/
  Edited by:
  @author Valerie Figuracion
 
  
 /*RaspPi-Arduino Serial Communication
- *ArduinoPiSerialConnection.java on the RaspPi
+ *ArduinoPiSerialConnection.java on the RPi
  *SensorsData.ino on the Arduino
  **/
 
 package endpoint;
 
 //import com.pi4j.io.serial.*;
-//import com.pi4j.util.Console;
-
-//import java.io.IOException;
-//import java.io.InputStream;
 
 import java.io.*;
 import java.util.*;
-import javax.comm.*;//RXTX bs
+//import javax.comm.*;//RXTX bs
 
-//import javax.CommPort;
+import gnu.io.*;
 
 import network.*;
 import logging.SmartLog;
-
 
 public class ArduinoPiSerialConnection extends Thread {
 
@@ -37,7 +29,7 @@ public class ArduinoPiSerialConnection extends Thread {
 	private SmartLog logger = new SmartLog(ArduinoPiSerialConnection.class.getName());
 		
 	//Method
-	public ArduinoPiSerialConnection(String portName) throws Exception{
+	public void SerialConnection(String portName) throws Exception{
 		
 		//Initializes the port for the serial connection.
 		CommPortIdentifier portID = CommPortIdentifier.getPortIdentifier(portName);
@@ -63,7 +55,8 @@ public class ArduinoPiSerialConnection extends Thread {
 			serialPort.notifyOnDataAvailable(true);
 
 			//SerialReader thread starts
-			(new Thread(new SerialReader(in))).start();
+			SerialReader sr = new SerialReader(in);
+			new Thread(sr).start();
 			
 		}else{
 			//gives an error if port is not serial
@@ -90,7 +83,7 @@ public class ArduinoPiSerialConnection extends Thread {
 				  System.out.print( new String( buffer, 0, len ) );
 				}
 			} catch(IOException e) {
-			e.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 	}
@@ -117,15 +110,17 @@ public class ArduinoPiSerialConnection extends Thread {
 	}
 
 	//Main method so it can do stuff
-	public static void main(String[] args) {
-		try {
+	public static void main(String[] args){
+		try{
 			//connection will ideally connect the pi and the arduino through /dev/ttyAMA0
-		  ( new ArduinoPiSerialConnection() ).ArduinoPiSerialConnection( "/dev/ttyAMA0" );
-		} catch( Exception e ) {
-		  e.printStackTrace();
+			ArduinoPiSerialConnection APSC = new ArduinoPiSerialConnection();
+			APSC.SerialConnection("/dev/ttyAMA0");
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 	}
+}
 
 	//TODO: Recieve info from Arduino
 	//TODO: Package sensor info
-}
+
