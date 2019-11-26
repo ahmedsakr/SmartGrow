@@ -1,4 +1,4 @@
-/*
+/**
  * This file is part of the Pi4J project. More information about
  * this project can be found here:  https://www.pi4j.com/
  Code made by:
@@ -11,19 +11,23 @@
 /*RaspPi-Arduino Serial Communication
  *ArduinoPiSerialConnection.java on the RaspPi
  *SensorsData.ino on the Arduino
- */
+ **/
 
 package endpoint;
 
-import com.pi4j.io.serial.*;
-import com.pi4j.util.Console;
+//import com.pi4j.io.serial.*;
+//import com.pi4j.util.Console;
 
-import java.io.IOException;
-import java.io.InputStream;
+//import java.io.IOException;
+//import java.io.InputStream;
 
-import javax.CommPort;
+import java.io.*;
+import java.util.*;
+import javax.comm.*;//RXTX bs
 
-import network*;
+//import javax.CommPort;
+
+import network.*;
 import logging.SmartLog;
 
 
@@ -79,12 +83,12 @@ public class ArduinoPiSerialConnection extends Thread {
 
 		//(Does this need to be overriden? I think there's already a method I can call. I have to find it though)
 		public void run() {
-			byte[] buffer = new byte[ 1024 ];
+			byte[] buffer = new byte[ 512 ];
 			int len = -1;
 			try {
-			while( ( len = this.in.read( buffer ) ) > -1 ) {
-			  System.out.print( new String( buffer, 0, len ) );
-			}
+				while( ( len = this.in.read( buffer ) ) > -1 ) {
+				  System.out.print( new String( buffer, 0, len ) );
+				}
 			} catch(IOException e) {
 			e.printStackTrace();
 			}
@@ -97,7 +101,7 @@ public class ArduinoPiSerialConnection extends Thread {
 		
 		//Initialize Leaf (port?)
 		try {
-			private Leaf leaf = new Leaf(Identity.PLANT_ENDPOINT);
+			Leaf leaf = new Leaf(Identity.PLANT_ENDPOINT);
 
 			//Get information from SerialReader (I think?)
 			while(true){
@@ -106,7 +110,7 @@ public class ArduinoPiSerialConnection extends Thread {
 			}
 		} catch (SocketException | IOException | CorruptPacketException |InterruptedException e) {
 			logger.fatal(e);
-		} finally{
+		} finally {
 			//close leaf
 			leaf.close();
 		}
