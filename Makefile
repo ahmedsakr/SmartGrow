@@ -2,7 +2,7 @@ JAVA_LIBRARIES=lib/*
 DIST_PATH=dist
 
 DATABASE_NAME=smartgrow
-DATABASE_SCHEMA=cps/database/schemas/plants.sql
+DATABASE_SCHEMA=cps/database/schemas/smartgrow.sql
 
 SERVER_MAIN=cps/CentralProcessingServer.java
 SIMULATION_MAIN=endpoint/simulation/SimulatedPlantEndpoint.java

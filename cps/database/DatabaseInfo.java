@@ -23,4 +23,7 @@ public class DatabaseInfo {
 
     // The table name for the plant sensors data
     public static final String DATABASE_SENSORS_TABLE = "plant_data";
+
+    // The table name for the leaf accounts
+    public static final String DATABASE_LEAF_ACCOUNTS_TABLE = "leaf_accounts";
 }
