@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Scanner;
 
+import cps.accounts.Account;
 import cps.database.tables.LeafAccounts;
 import cps.database.exceptions.SmartgrowDatabaseException;
 
@@ -31,7 +32,7 @@ public class AccountManager {
     private static final String ARP_COMMAND = "arp -a";
 
     // The LeafAccounts table wrapper
-    private LeafAccounts leafAccounts;
+    private LeafAccounts accounts;
 
     // Local addresses obtained from all discovered interfaces on the machine.
     private ArrayList<String> localAddresses;
@@ -41,24 +42,29 @@ public class AccountManager {
      *
      * @throws SocketException
      */
-    public AccountManager(LeafAccounts leafAccounts) throws SocketException {
+    public AccountManager(LeafAccounts accounts) throws SocketException {
 
-        this.leafAccounts = leafAccounts;
+        this.accounts = accounts;
 
         // Discover all addresses on interfaces registered on this machine
         this.indexLocalAddresses();
     }
 
     /**
-     * Check if the leaf identified by the IPv4 address already has an account
-     * with SmartGrow.
+     * Retrieve the account information for the leaf identified by the IPv4 address.
      *
      * @param address The IPv4 address of the leaf
-     * @return      true    if the leaf already has an account
-     *              false   Otherwise
+     * @return An account object if the leaf has an existing account entry. Otherwise, if the
+     *         leaf has never been seen before, null is returned.
      */
-    public boolean accountExists(String address) throws SmartgrowDatabaseException, IOException {
-        return this.leafAccounts.getLeafId(this.getMACAddress(address)) != LeafAccounts.ACCOUNT_DOES_NOT_EXIST;
+    public Account getAccount(String address) throws SmartgrowDatabaseException, IOException {
+        int leafId = this.accounts.getLeafId(this.getMACAddress(address));
+
+        if (leafId == LeafAccounts.ACCOUNT_DOES_NOT_EXIST) {
+            return null;
+        } else {
+            return new Account(leafId, address);
+        }
     }
 
     /**
@@ -67,7 +73,7 @@ public class AccountManager {
      * @param address The leaf identified by its IPv4 address
      */
     public void createAccount(String address) throws SmartgrowDatabaseException, IOException {
-        this.leafAccounts.storeMacAddress(this.getMACAddress(address));
+        this.accounts.storeMacAddress(this.getMACAddress(address));
     }
 
     /**
