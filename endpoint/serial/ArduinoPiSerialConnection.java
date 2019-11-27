@@ -14,11 +14,9 @@ package endpoint.serial;
 
 import endpoint.sensors.SupportedSensors;
 
-import gnu.CommPort;
-import gnu.CommPortIdentifier;
-import gnu.SerialPort;
-import gnu.SerialPortEvent;
-import gnu.SerialPortEventListener;
+import javax.comm.SerialPort;
+import javax.comm.CommPortIdentifier;
+import javax.comm.CommPort;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -119,7 +117,7 @@ public class ArduinoPiSerialConnection extends Thread {
 			SensorsData data = new SensorsData();
 			
 			try {
-				SerialReader.sleep(1000);
+				Thread.sleep(1000);
 				data.clear();
 				
 				/*
