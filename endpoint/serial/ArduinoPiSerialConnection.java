@@ -14,11 +14,11 @@ package endpoint.serial;
 
 import endpoint.sensors.SupportedSensors;
 
-import gnu.CommPort;
-import gnu.CommPortIdentifier;
-import gnu.SerialPort;
-import gnu.SerialPortEvent;
-import gnu.SerialPortEventListener;
+import javax.comm.CommPortIdentifier;
+import javax.comm.CommPort;
+import javax.comm.SerialPort;
+import javax.comm.SerialPortEvent;
+import javax.comm.SerialPortEventListener;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,60 +53,52 @@ public class ArduinoPiSerialConnection extends Thread {
 		//Will determine if it is already in use or not
 		if( portID.isCurrentlyOwned() ) {
 			logger.error("Error: Port is currently in use");
-		} else {
+		} 
+		else {
 			int timeout = 2000;
 			//Opens the port of the serial connection (RPi or Arduino?)
 			CommPort port = portID.open(this.getClass().getName(), timeout);
-		}
-		
-		//SerialPort is subclass of CommPort. Will initialize if CommPort is a SerialPort.
-		if(port instanceof SerialPort) {
-			//Masks CommPort into SerialPort
-			SerialPort serialPort = (SerialPort) port; 
-			
-			//Initialize parameters for the SerialPort (on Arduino I think)
-			serialPort.setSerialPortParams( 9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE );
-			
-			//Initializes input stream for the serial port (so the arduino can send data to the Pi)
-			InputStream in = serialPort.getInputStream();
-			
-			//SerialReader thread starts
-			SerialReader sr = new SerialReader(in);
-			new Thread(sr).start();
+				
+			//SerialPort is subclass of CommPort. Will initialize if CommPort is a SerialPort.
+			if(port instanceof SerialPort) {
+				//Masks CommPort into SerialPort
+				SerialPort serialPort = (SerialPort) port; 
+				
+				//Initialize parameters for the SerialPort (on Arduino I think)
+				serialPort.setSerialPortParams( 9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE );
+				
+				//Initializes input stream for the serial port (so the arduino can send data to the Pi)
+				InputStream in = serialPort.getInputStream();
+				
+				//SerialReader thread starts
+				 (new Thread(new ArduinoPiSerialConnection())).start();
 
-			//Will listen to the port to see if there is any changes and notifies if there's data available
-			serialPort.addEventListener(new SerialReader(in));
-            serialPort.notifyOnDataAvailable(true);
-		}else{
-			//Gives an error if port is not serial
-			logger.error("Error: Must be a serial port");
+				//Will listen to the port to see if there is any changes and notifies if there's data available
+				serialPort.addEventListener(new SerialReader(in));
+				serialPort.notifyOnDataAvailable(true);
+			}
+			else{
+				//Gives an error if port is not serial
+				logger.error("Error: Must be a serial port");
+			}
 		}
 	}
 
 	//Serial reader allows the Pi to receive data from the arduino (hopefully)
-	public static class SerialReader implements Runnable {
+	public static class SerialReader implements SerialPortEventListener {
 
 		InputStream in;
 		
 		public SerialReader(InputStream in) { this.in = in; }
 
 		//TODO: Receive information from the arduino 
+		//ID (1 BYTE) DATA (8 BYTES)
 		
-		public void run() {
+		public void serialEvent(SerialPortEvent arg0){
 			byte[] buffer = new byte[ 512 ];
 			int len = -1;
 
-			int bytesForData = 9;
-			
-			try {
-				while( ( len = this.in.read( buffer ) ) > -1 ) {
-					
-
-				 	System.out.print( new String( buffer, 0, len ) );
-				}
-			} catch(IOException e) {
-				e.printStackTrace();
-			}
+			int bytesForData = 9;	
 		}
 		//end todo
 	}
@@ -119,7 +111,7 @@ public class ArduinoPiSerialConnection extends Thread {
 			SensorsData data = new SensorsData();
 			
 			try {
-				SerialReader.sleep(1000);
+				Thread.sleep(1000);
 				data.clear();
 				
 				/*
