@@ -12,6 +12,7 @@ import java.util.Enumeration;
 import java.util.Scanner;
 
 import cps.database.tables.LeafAccounts;
+import cps.database.exceptions.SmartgrowDatabaseException;
 
 /**
  * AccountManager provides the SmartGrow server with an ability
@@ -56,8 +57,17 @@ public class AccountManager {
      * @return      true    if the leaf already has an account
      *              false   Otherwise
      */
-    public boolean accountExists(String address) throws IOException {
-        return this.leafAccounts.getLeafId(this.getMACAddress(address)) != -1;
+    public boolean accountExists(String address) throws SmartgrowDatabaseException, IOException {
+        return this.leafAccounts.getLeafId(this.getMACAddress(address)) != LeafAccounts.ACCOUNT_DOES_NOT_EXIST;
+    }
+
+    /**
+     * Creates a new account for the provided IP address using its MAC address.
+     *
+     * @param address The leaf identified by its IPv4 address
+     */
+    public void createAccount(String address) throws SmartgrowDatabaseException, IOException {
+        this.leafAccounts.storeMacAddress(this.getMACAddress(address));
     }
 
     /**

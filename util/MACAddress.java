@@ -7,7 +7,7 @@ public class MACAddress {
     // The logging instance for this class
     private static final SmartLog logger = new SmartLog(MACAddress.class.getName());
 
-    private static final String MAC_ADDRESS_FORMAT = "%X:%X:%X:%X:%X:%X";
+    private static final String MAC_ADDRESS_FORMAT = "%x:%x:%x:%x:%x:%x";
     private static final int MAC_ADDRESS_LENGTH = 6;
 
     /**
