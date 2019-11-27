@@ -91,7 +91,7 @@ public class ArduinoPiSerialConnection extends Thread {
 		public SerialReader(InputStream in) { this.in = in; }
 
 		//TODO: Receive information from the arduino 
-		//ID (1 BYTE) DATA (8 BYTES)
+		
 		public void run() {
 			byte[] buffer = new byte[ 512 ];
 			int len = -1;

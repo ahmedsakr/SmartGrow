@@ -1,5 +1,5 @@
 #include "dht11.h"
-#define DELAY 2000
+#define DELAY 5000
 
 dht11 DHT;
 const int SMSensorPin = A0;
@@ -40,16 +40,16 @@ void loop() {
     switch (DHTValue)
     {
       case DHTLIB_OK:  
-        Serial.print("OK,\t");
+        Serial.print("OK, ");
         break;
       case DHTLIB_ERROR_CHECKSUM: 
-        Serial.print("Checksum error, \t");
+        Serial.print("Checksum error, ");
         break;
       case DHTLIB_ERROR_TIMEOUT: 
-        Serial.print("Time out error, \t");
+        Serial.print("Time out error, ");
         break;
       default: 
-        Serial.print("Unknown error, \t");
+        Serial.print("Unknown error, ");
         break;
     }
 
@@ -74,7 +74,7 @@ void loop() {
     Serial.print(DHT.humidity);
     Serial.println(" Humidity Level");
     //SOIL MOISTURE
-    Serial.println(SMPercent);
+    Serial.print(SMPercent);
     Serial.println("% Moisture Level");
     Serial.println("END");
   
