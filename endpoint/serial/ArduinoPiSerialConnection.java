@@ -15,10 +15,10 @@ package endpoint.serial;
 import endpoint.sensors.SupportedSensors;
 
 import gnu.CommPort;
-import gnu.io.CommPortIdentifier;
-import gnu.io.SerialPort;
-import gnu.io.SerialPortEvent;
-import gnu.io.SerialPortEventListener;
+import gnu.CommPortIdentifier;
+import gnu.SerialPort;
+import gnu.SerialPortEvent;
+import gnu.SerialPortEventListener;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,6 +37,7 @@ public class ArduinoPiSerialConnection extends Thread {
 	//Creates a logger instance for the class
 	private SmartLog logger = new SmartLog(ArduinoPiSerialConnection.class.getName());
 
+	//Initialize the leaf
 	private Leaf leaf;
 	
 	public ArduinoPiSerialConnection(){ super("ArduinoPiSerialConnection"); }
@@ -52,7 +53,7 @@ public class ArduinoPiSerialConnection extends Thread {
 		//Will determine if it is already in use or not
 		if( portID.isCurrentlyOwned() ) {
 			logger.error("Error: Port is currently in use");
-		}else {
+		} else {
 			int timeout = 2000;
 			//Opens the port of the serial connection (RPi or Arduino?)
 			CommPort port = portID.open(this.getClass().getName(), timeout);
@@ -60,9 +61,11 @@ public class ArduinoPiSerialConnection extends Thread {
 		
 		//SerialPort is subclass of CommPort. Will initialize if CommPort is a SerialPort.
 		if(port instanceof SerialPort) {
-			SerialPort serialPort = (SerialPort)port; //Masks CommPort into SerialPort
+			//Masks CommPort into SerialPort
+			SerialPort serialPort = (SerialPort) port; 
+			
 			//Initialize parameters for the SerialPort (on Arduino I think)
-			serialPort.setSerialPortParams(9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE );
+			serialPort.setSerialPortParams( 9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE );
 			
 			//Initializes input stream for the serial port (so the arduino can send data to the Pi)
 			InputStream in = serialPort.getInputStream();
@@ -71,12 +74,11 @@ public class ArduinoPiSerialConnection extends Thread {
 			SerialReader sr = new SerialReader(in);
 			new Thread(sr).start();
 
-			//Notifies if there's data available
+			//Will listen to the port to see if there is any changes and notifies if there's data available
 			serialPort.addEventListener(new SerialReader(in));
-            		serialPort.notifyOnDataAvailable(true);
-			
+            serialPort.notifyOnDataAvailable(true);
 		}else{
-			//gives an error if port is not serial
+			//Gives an error if port is not serial
 			logger.error("Error: Must be a serial port");
 		}
 	}
@@ -86,23 +88,27 @@ public class ArduinoPiSerialConnection extends Thread {
 
 		InputStream in;
 		
-		//Method
-		public SerialReader(InputStream in) {
-			this.in = in;
-		}
+		public SerialReader(InputStream in) { this.in = in; }
 
-		//(Does this need to be overriden? I think there's already a method I can call. I have to find it though)
+		//TODO: Receive information from the arduino 
+		//ID (1 BYTE) DATA (8 BYTES)
 		public void run() {
 			byte[] buffer = new byte[ 512 ];
 			int len = -1;
+
+			int bytesForData = 9;
+			
 			try {
 				while( ( len = this.in.read( buffer ) ) > -1 ) {
+					
+
 				 	System.out.print( new String( buffer, 0, len ) );
 				}
 			} catch(IOException e) {
 				e.printStackTrace();
 			}
 		}
+		//end todo
 	}
 	
 	//Run method of the thread
@@ -117,10 +123,10 @@ public class ArduinoPiSerialConnection extends Thread {
 				data.clear();
 				
 				/*
-				data.addSensorData(SupportedSensors.AIR_HUMIDITY, getSimulatedValue(this.AIR_HUMIDITY_START));
-				data.addSensorData(SupportedSensors.AIR_TEMPERATURE, getSimulatedValue(this.AIR_TEMPERATURE_START));
-				data.addSensorData(SupportedSensors.LIGHT_INTENSITY, getSimulatedValue(this.LIGHT_INTENSITY_START));
-				data.addSensorData(SupportedSensors.SOIL_MOISTURE, getSimulatedValue(this.SOIL_MOISTURE_START));
+				data.addSensorData(SupportedSensors.AIR_HUMIDITY, );
+				data.addSensorData(SupportedSensors.AIR_TEMPERATURE, );
+				data.addSensorData(SupportedSensors.LIGHT_INTENSITY, );
+				data.addSensorData(SupportedSensors.SOIL_MOISTURE, );
 				*/
 				
 				// Dispatch the packet to the server.
@@ -151,5 +157,3 @@ public class ArduinoPiSerialConnection extends Thread {
 		}
 	}
 }
-
-	//TODO: Recieve info from Arduino
