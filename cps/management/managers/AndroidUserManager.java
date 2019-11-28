@@ -1,5 +1,6 @@
 package cps.management.managers;
 
+import cps.accounts.Account;
 import cps.database.DatabaseController;
 import cps.database.exceptions.SmartgrowDatabaseException;
 import cps.database.tables.PlantData;
@@ -38,7 +39,7 @@ public class AndroidUserManager implements LeafManager {
      * The handle instance for android user packets. Unimplemented at the moment.
      */
     @Override
-    public Packet handle(Packet packet) {
+    public Packet handle(Account account, Packet packet) {
         if (packet == null || !(packet instanceof RequestSensors)) {
             return null;
         }

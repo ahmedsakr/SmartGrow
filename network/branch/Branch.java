@@ -1,6 +1,7 @@
 package network.branch;
 
 import network.core.Packet;
+import network.stem.LeafAccountHandler;
 import network.branch.threads.DedicatedLeafServicer;
 import network.branch.threads.LeafPruningThread;
 import network.core.NodeLocation;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import cps.accounts.Account;
 import cps.management.LeafManager;
 import logging.SmartLog;
 
@@ -25,6 +27,9 @@ public class Branch {
 
     // The logger instance for this class.
     private static SmartLog logger = new SmartLog(Branch.class.getName());
+
+    // The account handler implementation for this branch.
+    private LeafAccountHandler accountHandler;
 
     // The list of live nodes connected to this stem.
     private ArrayList<DedicatedLeafServicer> servicers;
@@ -132,17 +137,35 @@ public class Branch {
     }
 
     /**
+     * Attach an account handler for all leaves under this branch.
+     *
+     * @param accountHandler The account handler implementation being attached to this branch.
+     */
+    public void addAccountHandler(LeafAccountHandler accountHandler) {
+        this.accountHandler = accountHandler;
+    }
+
+    /**
+     * Retrieve the account handler for this stem.
+     *
+     * @return The LeafAccountHandler implementation for this stem.
+     */
+    public LeafAccountHandler getAccountHandler() {
+        return this.accountHandler;
+    }
+
+    /**
      * Manage a packet received by a DedicatedLeafServicer.
      *
      * @param packet The received packet by the servicer.
      * @return The status of the management operation
      */
-    public Packet manage(Packet packet) {
+    public Packet manage(Account account, Packet packet) {
         if (this.manager == null) {
             return null;
         }
 
-        return this.manager.handle(packet);
+        return this.manager.handle(account, packet);
     }
 
     /**

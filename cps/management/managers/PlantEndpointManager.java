@@ -1,5 +1,6 @@
 package cps.management.managers;
 
+import cps.accounts.Account;
 import cps.database.DatabaseController;
 import cps.database.exceptions.SmartgrowDatabaseException;
 import cps.database.tables.PlantData;
@@ -40,7 +41,7 @@ public class PlantEndpointManager implements LeafManager {
      * The handling implementation for plant endpoints.
      */
     @Override
-    public Packet handle(Packet packet) {
+    public Packet handle(Account account, Packet packet) {
         if (packet == null || !(packet instanceof SensorsData)) {
             return null;
         }
@@ -48,7 +49,7 @@ public class PlantEndpointManager implements LeafManager {
         try {
 
             // Append the sensors data to the plant_data table.
-            this.plantsData.insertSensorsData((SensorsData) packet);
+            this.plantsData.insertSensorsData(account.getId(), (SensorsData) packet);
 
         } catch (SmartgrowDatabaseException ex) {
             logger.fatal("Unable to append data: " + ex.getMessage());
