@@ -1,6 +1,7 @@
 package network.branch;
 
 import network.core.Packet;
+import network.stem.LeafAccountHandler;
 import network.branch.threads.DedicatedLeafServicer;
 import network.branch.threads.LeafPruningThread;
 import network.core.NodeLocation;
@@ -25,6 +26,9 @@ public class Branch {
 
     // The logger instance for this class.
     private static SmartLog logger = new SmartLog(Branch.class.getName());
+
+    // The account handler implementation for this branch.
+    private LeafAccountHandler accountHandler;
 
     // The list of live nodes connected to this stem.
     private ArrayList<DedicatedLeafServicer> servicers;
@@ -129,6 +133,24 @@ public class Branch {
      */
     public void attachManager(LeafManager manager) {
         this.manager = manager;
+    }
+
+    /**
+     * Attach an account handler for all leaves under this branch.
+     *
+     * @param accountHandler The account handler implementation being attached to this branch.
+     */
+    public void addAccountHandler(LeafAccountHandler accountHandler) {
+        this.accountHandler = accountHandler;
+    }
+
+    /**
+     * Retrieve the account handler for this stem.
+     *
+     * @return The LeafAccountHandler implementation for this stem.
+     */
+    public LeafAccountHandler getAccountHandler() {
+        return this.accountHandler;
     }
 
     /**

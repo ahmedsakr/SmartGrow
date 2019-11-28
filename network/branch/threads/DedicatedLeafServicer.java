@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.lang.Runnable;
 import java.net.SocketException;
 
+import cps.accounts.Account;
+import cps.database.exceptions.SmartgrowDatabaseException;
 import logging.SmartLog;
 import network.branch.Branch;
 import network.core.NodeLocation;
@@ -97,6 +99,20 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
      */
     @Override
     public void run() {
+
+
+        Account account = null;
+
+        // Invoke the registered onLeafConnection handler for this starting leaf connection.
+        try {
+            account = this.branch.getAccountHandler().onLeafConnection(this.getDestination().getIpAddress());
+        } catch (SmartgrowDatabaseException | IOException ex) {
+
+            // Inability to perform account discovery operations disallows us
+            // from servicing the leaf.
+            logger.error("Unable to perform account handling for leaf from " + this.getDestination());
+            return;
+        }
 
         // Inform the leaf that they have been registered
         RegistrationResponse response = new RegistrationResponse();

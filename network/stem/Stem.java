@@ -68,21 +68,13 @@ public class Stem extends Transport {
     }
 
     /**
-     * Attach an account handler for all leaves under this stem.
+     * Attach an account handler to both branches.
      *
-     * @param accountHandler The account handler implementation being attached to this stem.
+     * @param accountHandler The account handler implementation being attached to the branches.
      */
     public void addAccountHandler(LeafAccountHandler accountHandler) {
-        this.accountHandler = accountHandler;
-    }
-
-    /**
-     * Retrieve the account handler for this stem.
-     *
-     * @return The LeafAccountHandler implementation for this stem.
-     */
-    public LeafAccountHandler getAccountHandler() {
-        return this.accountHandler;
+        this.plants.addAccountHandler(accountHandler);
+        this.users.addAccountHandler(accountHandler);
     }
 
     /**
