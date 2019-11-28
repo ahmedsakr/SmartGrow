@@ -22,5 +22,5 @@ CREATE TABLE plant_data(
 
 CREATE TABLE leaf_accounts(
     leaf_id SERIAL PRIMARY KEY,
-    macAddress TEXT
+    mac_address TEXT
 );

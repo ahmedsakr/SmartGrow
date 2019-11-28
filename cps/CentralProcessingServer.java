@@ -3,8 +3,10 @@ package cps;
 import java.net.SocketException;
 
 import config.SmartGrowConfiguration;
+import cps.accounts.AccountManager;
 import cps.database.DatabaseController;
 import cps.database.exceptions.SmartgrowDatabaseException;
+import cps.database.tables.LeafAccounts;
 import cps.management.managers.AndroidUserManager;
 import cps.management.managers.PlantEndpointManager;
 import logging.SmartLog;
@@ -53,6 +55,14 @@ public class CentralProcessingServer {
         // Attach the leaves managers to the stem.
         this.stem.addManager(Identity.PLANT_ENDPOINT, new PlantEndpointManager(this.controller));
         this.stem.addManager(Identity.ANDROID_USER, new AndroidUserManager(this.controller));
+
+        // Attach an account handler to this server instance.
+        try {
+            this.stem.addAccountHandler(new AccountManager(new LeafAccounts(this.controller)));
+        } catch (SocketException ex) {
+            logger.fatal("Failed to attach account manager to server.");
+            System.exit(1);
+        }
     }
 
     /**

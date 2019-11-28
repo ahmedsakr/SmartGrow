@@ -13,6 +13,7 @@ import network.core.exceptions.CorruptPacketException;
 import network.core.exceptions.TransportInterruptedException;
 import network.leaf.Identity;
 import network.stem.threads.StemListener;
+import network.stem.LeafAccountHandler;
 
 /**
  * The Stem abstraction is an aggregation of branches that manage
@@ -33,6 +34,9 @@ public class Stem extends Transport {
 
     // There are two branches on a stem: one for the plant endpoints and one for android users.
     private Branch plants, users;
+
+    // The account handler implementation for this stem.
+    private LeafAccountHandler accountHandler;
 
     /**
      * Initialize a stem on the specified port.
@@ -61,6 +65,24 @@ public class Stem extends Transport {
         } else {
             this.users.attachManager(manager);
         }
+    }
+
+    /**
+     * Attach an account handler for all leaves under this stem.
+     *
+     * @param accountHandler The account handler implementation being attached to this stem.
+     */
+    public void addAccountHandler(LeafAccountHandler accountHandler) {
+        this.accountHandler = accountHandler;
+    }
+
+    /**
+     * Retrieve the account handler for this stem.
+     *
+     * @return The LeafAccountHandler implementation for this stem.
+     */
+    public LeafAccountHandler getAccountHandler() {
+        return this.accountHandler;
     }
 
     /**

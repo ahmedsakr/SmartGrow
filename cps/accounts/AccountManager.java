@@ -14,6 +14,7 @@ import java.util.Scanner;
 import cps.accounts.Account;
 import cps.database.tables.LeafAccounts;
 import cps.database.exceptions.SmartgrowDatabaseException;
+import network.stem.LeafAccountHandler;
 
 /**
  * AccountManager provides the SmartGrow server with an ability
@@ -23,7 +24,7 @@ import cps.database.exceptions.SmartgrowDatabaseException;
  * @author Ahmed Sakr
  * @since November 25, 2019
  */
-public class AccountManager {
+public class AccountManager implements LeafAccountHandler {
 
     // The logging instance for this class
     private static final SmartLog logger = new SmartLog(AccountManager.class.getName());
@@ -48,6 +49,25 @@ public class AccountManager {
 
         // Discover all addresses on interfaces registered on this machine
         this.indexLocalAddresses();
+    }
+
+    /**
+     * Implementation for the LeafAccountHandler interface method.
+     * This is called when a leaf has sent a registration request to the server.
+     *
+     * @param address The IPv4 address of the leaf
+     * @return The Account object for the leaf
+     */
+    @Override
+    public Account onLeafConnection(String address) throws SmartgrowDatabaseException, IOException {
+
+        // Create an account for the leaf if it does not already have one
+        if (this.getAccount(address) == null) {
+            this.createAccount(address);
+        }
+
+        // Return the account information for this leaf
+        return this.getAccount(address);
     }
 
     /**
