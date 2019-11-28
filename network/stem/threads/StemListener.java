@@ -12,6 +12,7 @@ import network.core.packets.GenericError;
 import network.core.packets.registration.LeafRegistration;
 import network.leaf.Identity;
 import network.stem.Stem;
+import cps.database.exceptions.SmartgrowDatabaseException;
 
 /**
  * StemListener is a worker thread utilized by the Stem class
@@ -81,6 +82,14 @@ public class StemListener extends Thread {
                     this.stem.send(error);
                 } else {
                     logger.info("New client from " + location);
+
+                    // Inability to perform account discovery operations is not critical to the
+                    // operation of the system.
+                    try {
+                        this.stem.getAccountHandler().onLeafConnection(location.getIpAddress());
+                    } catch (SmartgrowDatabaseException | IOException ex) {
+                        logger.warn("Unable to perform account handling for leaf from " + location);
+                    }
                     
                     // Register the leaf with the stem
                     LeafRegistration registration = (LeafRegistration) packet;

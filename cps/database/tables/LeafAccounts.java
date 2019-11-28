@@ -49,7 +49,7 @@ public class LeafAccounts {
         }
 
         // Fetch the corresponding leaf_id for the macAddress
-        String sql = String.format("SELECT leaf_id FROM %s WHERE macAddress = '%s'",
+        String sql = String.format("SELECT leaf_id FROM %s WHERE mac_address = '%s'",
             DatabaseInfo.DATABASE_LEAF_ACCOUNTS_TABLE, macAddress);
         ResultSet result = this.database.query(sql);
 
@@ -78,7 +78,7 @@ public class LeafAccounts {
         }
 
         // Update the SQL table with the macAddress
-        String sql = String.format("INSERT INTO %s (macAddress) VALUES ('%s')",
+        String sql = String.format("INSERT INTO %s (mac_address) VALUES ('%s')",
             DatabaseInfo.DATABASE_LEAF_ACCOUNTS_TABLE, macAddress);
         this.database.update(sql);
     }
