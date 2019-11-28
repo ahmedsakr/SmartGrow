@@ -1,5 +1,6 @@
 package cps.management;
 
+import cps.accounts.Account;
 import network.core.Packet;
 
 /**
@@ -14,9 +15,10 @@ public interface LeafManager {
     /**
      * Handle a packet received from a leaf.
      *
+     * @param account The account associated with the leaf.
      * @param packet A SmartGrow packet received from the leaf.
      * @return      true    If handling went as expected
      *              false   Otherwise
      */
-    Packet handle(Packet packet);
+    Packet handle(Account account, Packet packet);
 }

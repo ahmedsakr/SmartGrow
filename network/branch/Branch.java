@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import cps.accounts.Account;
 import cps.management.LeafManager;
 import logging.SmartLog;
 
@@ -159,12 +160,12 @@ public class Branch {
      * @param packet The received packet by the servicer.
      * @return The status of the management operation
      */
-    public Packet manage(Packet packet) {
+    public Packet manage(Account account, Packet packet) {
         if (this.manager == null) {
             return null;
         }
 
-        return this.manager.handle(packet);
+        return this.manager.handle(account, packet);
     }
 
     /**

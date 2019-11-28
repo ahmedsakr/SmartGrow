@@ -36,15 +36,16 @@ public class PlantData {
     /**
      * Insert the sensors data into the plant_data table.
      *
+     * @param plantId The id of the plant for which the data belongs to
      * @param data The SensorsData packet retrieved from a plant endpoint.
      * @throws SmartgrowDatabaseException
      */
-    public void insertSensorsData(SensorsData data) throws SmartgrowDatabaseException {
+    public void insertSensorsData(int plantId, SensorsData data) throws SmartgrowDatabaseException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String sql = String.format(
             "INSERT INTO %s (plant_id, time_taken, light_intensity, air_humidity, air_temperature, soil_moisture) " +
             "VALUES (%d, '%s', %f, %f, %f, %f);",
-             DatabaseInfo.DATABASE_SENSORS_TABLE, 1, formatter.format(LocalDateTime.now()),
+             DatabaseInfo.DATABASE_SENSORS_TABLE, plantId, formatter.format(LocalDateTime.now()),
              data.getSensorData(SupportedSensors.LIGHT_INTENSITY),
              data.getSensorData(SupportedSensors.AIR_HUMIDITY),
              data.getSensorData(SupportedSensors.AIR_TEMPERATURE),
