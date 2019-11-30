@@ -15,4 +15,5 @@ public class OpCodes {
     public static final byte REQUEST_SENSORS = 3;
     public static final byte GENERIC_ERROR = 4;
     public static final byte ACKNOWLEDGEMENT = 5;
+    public static final byte AVAILABLE_PLANTS = 6;
 }
