@@ -106,7 +106,7 @@ public class SensorsData extends Packet {
         // A sensor data block consists of the sensor id (1 byte) and sensor value (8 bytes)
         int sensorDataLength = 1 + Double.BYTES;
 
-        for (int i = 1; payload[i] != 0; i += sensorDataLength) {
+        for (int i = 0; payload[i] != 0; i += sensorDataLength) {
             this.data.put(payload[i],
                 this.convertBytesToDouble(Arrays.copyOfRange(payload, i + 1, i + sensorDataLength)));
         }

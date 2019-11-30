@@ -71,8 +71,8 @@ public class RegistrationResponse extends Packet {
      */
     @Override
     protected void extract(byte[] payload) {
-        this.setStatus(payload[1] == 1);
-        this.setRegistrationDetails(super.getString(Arrays.copyOfRange(payload, 2, payload.length)));
+        this.setStatus(payload[0] == 1);
+        this.setRegistrationDetails(super.getString(Arrays.copyOfRange(payload, 1, payload.length)));
     }
 
     /**

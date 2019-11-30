@@ -5,11 +5,12 @@ import java.net.SocketException;
 
 import config.SmartGrowConfiguration;
 import logging.SmartLog;
-
+import network.branch.BroadcastHandler;
 import network.core.NodeLocation;
 import network.core.Packet;
 import network.core.Transport;
 import network.core.exceptions.CorruptPacketException;
+import network.leaf.threads.BroadcastHandlerThread;
 import network.leaf.threads.LeafRegistrationThread;
 
 /**
@@ -41,6 +42,12 @@ public class Leaf extends Transport {
     // The worker responsible for registering us with the server.
     private LeafRegistrationThread worker;
 
+    // The handler responsible for servicing broadcasts received on this leaf object.
+    private BroadcastHandler broadcastHandler;
+
+    // The worker responsible for processing broadcasts on behalf of this leaf.
+    private BroadcastHandlerThread broadcastHandlerThread;
+
     // State information about this leaf instance
     private Identity identity;
     private boolean registered;
@@ -67,6 +74,24 @@ public class Leaf extends Transport {
 
         this.identity = identity;
         this.worker = new LeafRegistrationThread(this);
+    }
+
+    /**
+     * Attach a broadcast handler for all packets received on this leaf that are broadcasts.
+     *
+     * @param handler The broadcast handler that will be called when broadcast packets are received.
+     */
+    public void attachBroadcastHandler(BroadcastHandler handler) {
+        this.broadcastHandler = handler;
+    }
+
+    /**
+     * Retrieve the registered broadcast handler for this leaf object.
+     *
+     * @return The registered broadcast handler, if it exists. Otherwise, null is returned.
+     */
+    public BroadcastHandler getBroadcastHandler() {
+        return this.broadcastHandler;
     }
 
     /**
@@ -148,7 +173,34 @@ public class Leaf extends Transport {
             }
         }
 
-        return super.receive();
+        Packet response = super.receive();
+
+        /*
+         * A broadcast packet being received means we got interrupted from our intended receive.
+         * However, we can't ignore this packet and go back to receiving. We must pass off this
+         * broadcast packet to the appropriate handler first.
+         */
+        if  (response.isBroadcast()) {
+            if (this.getBroadcastHandler() != null) {
+                synchronized (this.broadcastHandler) {
+
+                    // Pass off the broadcast to the thread before waking it up.
+                    this.broadcastHandlerThread.setBroadcastPacket(response);
+                    
+                    // Awake the thread so that it can process the broadcast, relinquishing us
+                    // from this responsibility.
+                    this.broadcastHandlerThread.notify();
+                }
+            }
+
+            // Now that the broadcast processing has been delegated to someone else, we need to go
+            // back into our receiving state to listen for our intended packet.
+            return this.receive();
+        }
+
+        // Immediately return the response if it wasn't a broadcast. This means we got the packet
+        // that we were waiting for.
+        return response;
     }
 
     /*

@@ -86,8 +86,8 @@ public class GenericError extends Packet {
      */
     @Override
     public void extract(byte[] data) {
-        this.setErrorType(data[1]);
-        this.setErrorMessage(super.getString(Arrays.copyOfRange(data, 2, data.length)));
+        this.setErrorType(data[0]);
+        this.setErrorMessage(super.getString(Arrays.copyOfRange(data, 1, data.length)));
     }
 
     /**

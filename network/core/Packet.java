@@ -36,6 +36,10 @@ public abstract class Packet {
     // All packets are fixed to be 512 bytes at all times.
     public static final int PACKET_SIZE = 512;
 
+    // The intended target for this packet
+    public static byte DESTINATION_SINGLE = 0;
+    public static byte DESTINATION_BROADCAST = 1;
+
     private CRC32 crc;
     private byte[] data;
     private int size;
@@ -49,11 +53,35 @@ public abstract class Packet {
      */
     public Packet(byte opcode) {
         this.data = new byte[PACKET_SIZE];
+
+        // The default destination for the packet is a known target.
         this.data[0] = opcode;
-        this.size = 1;
+        this.data[1] = DESTINATION_SINGLE;
+
+        // The first 2 bytes are initialized as the opcode and destination type
+        this.size = 2;
 
         this.crc = new CRC32();
         this.packet = new DatagramPacket(this.data, this.data.length);
+    }
+
+    /**
+     * Check if this packet is a broadcast packet.
+     *
+     * @return  true    if the packet is broadcast
+     *          false   Otherwise
+     */
+    public boolean isBroadcast() {
+        return this.data[1] == DESTINATION_BROADCAST;
+    }
+
+    /**
+     * Override the broadcast status of this packet.
+     *
+     * @param broadcast The packet is intended for multiple destinations.
+     */
+    public void setBroadcast(boolean broadcast) {
+        this.data[1] = broadcast ? DESTINATION_BROADCAST : DESTINATION_SINGLE;
     }
 
     /**
@@ -142,7 +170,13 @@ public abstract class Packet {
             throw new CRCVerificationException("CRC check failed");
         }
 
-        pkt.extract(payload);
+        // Extract the destination target from the payload
+        pkt.setBroadcast(payload[1] == Packet.DESTINATION_BROADCAST);
+
+        // Extract the rest of the items from the packet using the subclass implementation
+        // of extract().
+        pkt.extract(Arrays.copyOfRange(payload, 2, payload.length));
+
         return pkt;
     }
 
@@ -179,8 +213,8 @@ public abstract class Packet {
      */
     public void compile() {
         
-        // Reset the packet data by moving the size back to 1.
-        this.size = 1;
+        // Reset the packet data by moving the size back to 2.
+        this.size = 2;
 
         // Invoke the subclass implementation to bring the packet contents in.
         this.build();
