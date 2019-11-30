@@ -5,9 +5,11 @@
     <string name="air_humidity_header">Air Humidity</string>
     <string name="soil_moisture_header">Soil Moisture</string>
     <string name="accessibility_description_logo">SmartGrow Logo</string>
-    <string name="light_intensity_placeholder">0</string>
-    <string name="air_humidity_placeholder">0</string>
-    <string name="air_temperature_placeholder">0</string>
-    <string name="soil_moisture_placeholder">0</string>
     <string name="realtime_header">Real-Time</string>
+    <string name="plant_selection_header">Please select the plant you would like to monitor</string>
+    <string name="temperature_sensor_unit">°C</string>
+    <string name="air_humidity_unit">%%RH</string>
+    <string name="sensor_data_placeholder">0</string>
+    <string name="light_intensity_unit">Wb</string>
+    <string name="soil_moisture_unit">Ba</string>
 </resources>

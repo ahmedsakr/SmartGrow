@@ -131,10 +131,6 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
             }
 
             // Begin the receive-respond loop of the servicer.
-            //
-            // For now, all it does is receive but it will not respond.
-            // Once we have the implementation of the rest of the system,
-            // this should be changed to fulfill leaf requests
             while (true) {
                 Packet request = this.receive();
                 logger.info("received packet from leaf: " + request);
@@ -143,7 +139,7 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
                     this.lastReceivedTime = System.currentTimeMillis();
                 }
 
-                // Manage the packet and send the response back to the leaf
+                // Invoke the packet manager that will return a packet we can send back to the leaf.
                 this.send(this.branch.manage(account, request));
             }
         } catch (TransportInterruptedException ex) {
