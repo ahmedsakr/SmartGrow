@@ -8,6 +8,8 @@ import java.util.Locale;
 
 import endpoint.sensors.SupportedSensors;
 import logging.SmartLog;
+import network.branch.BroadcastHandler;
+import network.core.Packet;
 import network.core.exceptions.CorruptPacketException;
 import network.core.packets.sensors.RequestSensors;
 import network.core.packets.sensors.SensorsData;
@@ -21,7 +23,7 @@ import network.leaf.Leaf;
  * @author Ahmed Sakr
  * @since November 23, 2019
  */
-public class RealtimeSensors extends Thread {
+public class RealtimeSensors extends Thread implements BroadcastHandler {
 
     private SmartLog logger = new SmartLog(RealtimeSensors.class.getName());
     private Leaf leaf;
@@ -33,6 +35,17 @@ public class RealtimeSensors extends Thread {
 
         // Immediately start the sensors thread
         this.start();
+    }
+
+    /**
+     * Handle any broadcasts received from the server.
+     * Invoked in the broadcast handler thread of the leaf.
+     *
+     * @param packet The broadcast packet to process
+     */
+    @Override
+    public void handleBroadcast(Packet packet) {
+
     }
 
     /*
@@ -91,6 +104,9 @@ public class RealtimeSensors extends Thread {
             logger.fatal("Unable to initialize the SmartGrow leaf: " + ex.getMessage());
             return;
         }
+
+        // Set this object as the broadcast handler for the leaf.
+        this.leaf.attachBroadcastHandler(this);
 
         try {
 

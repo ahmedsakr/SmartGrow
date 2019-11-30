@@ -9,6 +9,7 @@ import java.util.zip.CRC32;
 
 import network.core.packets.Acknowledgement;
 import network.core.packets.GenericError;
+import network.core.packets.plants.AvailablePlants;
 import network.core.packets.registration.LeafRegistration;
 import network.core.packets.registration.RegistrationResponse;
 import network.core.packets.sensors.RequestSensors;
@@ -160,6 +161,9 @@ public abstract class Packet {
                 break;
             case OpCodes.ACKNOWLEDGEMENT:
                 pkt = new Acknowledgement();
+                break;
+            case OpCodes.AVAILABLE_PLANTS:
+                pkt = new AvailablePlants();
                 break;
             default:
                 throw new OpCodeNotRecognizedException("Packet OpCode is not recognized");
