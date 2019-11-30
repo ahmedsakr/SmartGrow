@@ -176,6 +176,9 @@ public class Branch {
     public synchronized void broadcast(Packet packet) throws IOException {
         logger.debug("Broadcasting packet to all leaves");
 
+        // Setting the packet to broadcast informs the leaves to process it as a broadcast
+        packet.setBroadcast(true);
+
         for (DedicatedLeafServicer servicer : this.servicers) {
             servicer.forwardBroadcast(packet);
         }
