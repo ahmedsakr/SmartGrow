@@ -116,7 +116,7 @@ public class SmartLog {
         }
 
         System.out.printf(LOG_FORMAT,
-            new SimpleDateFormat("HH:mm:ss.S").format(Calendar.getInstance().getTime()),
+            new SimpleDateFormat("HH:mm:ss.SSS").format(Calendar.getInstance().getTime()),
             Thread.currentThread().getName(),
             getLoggingLevelString(level),
             this.className, message);

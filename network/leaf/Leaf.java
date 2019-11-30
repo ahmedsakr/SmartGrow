@@ -40,7 +40,7 @@ public class Leaf extends Transport {
     private static SmartLog logger = new SmartLog(Leaf.class.getName());
 
     // The worker responsible for registering us with the server.
-    private LeafRegistrationThread worker;
+    private LeafRegistrationThread leafRegistrationThread;
 
     // The handler responsible for servicing broadcasts received on this leaf object.
     private BroadcastHandler broadcastHandler;
@@ -61,7 +61,8 @@ public class Leaf extends Transport {
         super(new NodeLocation(SmartGrowConfiguration.CPS_ADDRESS, SmartGrowConfiguration.CPS_PORT), port);
         
         this.identity = identity;
-        this.worker = new LeafRegistrationThread(this);
+        this.leafRegistrationThread = new LeafRegistrationThread(this);
+        this.broadcastHandlerThread = new BroadcastHandlerThread(this);
     }
 
     /**
@@ -73,7 +74,8 @@ public class Leaf extends Transport {
         super(new NodeLocation(SmartGrowConfiguration.CPS_ADDRESS, SmartGrowConfiguration.CPS_PORT));
 
         this.identity = identity;
-        this.worker = new LeafRegistrationThread(this);
+        this.leafRegistrationThread = new LeafRegistrationThread(this);
+        this.broadcastHandlerThread = new BroadcastHandlerThread(this);
     }
 
     /**
@@ -135,7 +137,7 @@ public class Leaf extends Transport {
         // By-pass these checks for the registration worker as this is only
         // intended to stop other callers from proceeding before registration
         // succeeds.
-        if (!Thread.currentThread().equals(this.worker)) {
+        if (!Thread.currentThread().equals(this.leafRegistrationThread)) {
             this.waitForRegistration();
 
             // Return null if the leaf failed to register.
@@ -163,7 +165,7 @@ public class Leaf extends Transport {
         // By-pass these checks for the registration worker as this is only
         // intended to stop other callers from proceeding before registration
         // succeeds.
-        if (!Thread.currentThread().equals(this.worker)) {
+        if (!Thread.currentThread().equals(this.leafRegistrationThread)) {
             this.waitForRegistration();
             
             // Return null if the leaf failed to register.
@@ -182,7 +184,7 @@ public class Leaf extends Transport {
          */
         if  (response.isBroadcast()) {
             if (this.getBroadcastHandler() != null) {
-                synchronized (this.broadcastHandler) {
+                synchronized (this.broadcastHandlerThread) {
 
                     // Pass off the broadcast to the thread before waking it up.
                     this.broadcastHandlerThread.setBroadcastPacket(response);

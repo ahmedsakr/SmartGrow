@@ -107,8 +107,7 @@ public class SensorsData extends Packet {
         int sensorDataLength = 1 + Double.BYTES;
 
         for (int i = 0; payload[i] != 0; i += sensorDataLength) {
-            this.data.put(payload[i],
-                this.convertBytesToDouble(Arrays.copyOfRange(payload, i + 1, i + sensorDataLength)));
+            this.data.put(payload[i], super.getDouble(payload, i + 1));
         }
     }
 

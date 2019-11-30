@@ -114,15 +114,11 @@ public class Branch {
      * 
      * @param location The IPv4 address of the leaf
      */
-    public synchronized void removeLeaf(NodeLocation location) {
-        for (DedicatedLeafServicer servicer : this.servicers) {
-            if (servicer.getDestination().equals(location)) {
-                logger.info("Stop leaf servicer for " + location);
-                servicer.stop();
-                this.servicers.remove(servicer);
-                break;
-            }
-        }
+    public synchronized void removeLeaf(DedicatedLeafServicer servicer) {
+        logger.info("Stop leaf servicer for " + servicer.getDestination());
+
+        servicer.stop();
+        this.servicers.remove(servicer);
     }
 
     /**

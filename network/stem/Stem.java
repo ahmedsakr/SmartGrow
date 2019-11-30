@@ -2,16 +2,19 @@ package network.stem;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.util.ArrayList;
 
 import cps.management.LeafManager;
 import logging.SmartLog;
 import network.branch.Branch;
+import network.branch.threads.DedicatedLeafServicer;
 import network.core.NodeLocation;
 import network.core.Packet;
 import network.core.Transport;
 import network.core.exceptions.CorruptPacketException;
 import network.core.exceptions.TransportInterruptedException;
 import network.leaf.Identity;
+import network.stem.threads.AvailablePlantsThread;
 import network.stem.threads.StemListener;
 import network.stem.LeafAccountHandler;
 
@@ -32,11 +35,11 @@ public class Stem extends Transport {
     // The StemListener thread for servicing leaves.
     private StemListener stemListener;
 
+    // The worker thread for broadcasting available plants to android users routinely.
+    private AvailablePlantsThread availablePlantsThread;
+
     // There are two branches on a stem: one for the plant endpoints and one for android users.
     private Branch plants, users;
-
-    // The account handler implementation for this stem.
-    private LeafAccountHandler accountHandler;
 
     /**
      * Initialize a stem on the specified port.
@@ -51,6 +54,25 @@ public class Stem extends Transport {
         
         // Initialize the leaf-servicing thread.
         this.stemListener = new StemListener(this);
+        this.availablePlantsThread = new AvailablePlantsThread(this);
+    }
+
+    /**
+     * Retrieve all active plants that are being serviced.
+     *
+     * @return A list of active plants in the SmartGrow System.
+     */
+    public Branch getPlants() {
+        return this.plants;
+    }
+
+    /**
+     * Retrieve all active android users that are being serviced.
+     *
+     * @return A list of active android users in the SmartGrow system.
+     */
+    public Branch getAndroidUsers() {
+        return this.users;
     }
 
     /**

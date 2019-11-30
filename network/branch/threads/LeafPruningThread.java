@@ -57,18 +57,13 @@ public class LeafPruningThread extends Thread {
 
                     // Check and collect all servicers whose leaf has not communicated past the
                     // acceptable threshold.
-                    List<DedicatedLeafServicer> deadLeaves = 
+                    List<DedicatedLeafServicer> deadServicers = 
                         servicers.stream()
                             .filter((servicer) -> currentTime - servicer.getLastReceivedTime() >= LEAF_PRUNING_THRESHOLD)
                             .collect(Collectors.toList());
 
-                    for (DedicatedLeafServicer servicer : deadLeaves) {
-                        logger.info("Stopping servicer for " + servicer.getDestination());
-
-                        // Interrupt and close the transport layer for the servicer.
-                        servicer.stop();
-                        servicers.remove(servicer);
-                    }
+                    // Remove all dead servicers from the branch
+                    deadServicers.forEach((servicer) -> this.branch.removeLeaf(servicer));
                 }
             } catch (InterruptedException ex) {
                 logger.error("Interrupted while sleeping. Pruning for branch " + this.branch + " is disabled.");
