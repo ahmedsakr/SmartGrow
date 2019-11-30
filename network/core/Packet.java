@@ -323,6 +323,41 @@ public abstract class Packet {
     }
 
     /**
+     * Extracts an integer from the array starting at the specified index.
+     *
+     * @param payload The payload to extract the integer from
+     * @param startingIndex The index into the array from which to extract the integer.
+     * @return An integer value composed of the 4 bytes from the array.
+     */
+    protected int getInt(byte[] payload, int startingIndex) {
+
+        // Index would overlap with CRC or exceed array
+        if (startingIndex + Integer.BYTES > this.PACKET_SIZE - 4) {
+            return -1;
+        }
+
+        return this.convertBytesToInt(Arrays.copyOfRange(payload, startingIndex, startingIndex + Integer.BYTES));
+    }
+
+    /**
+     * Extracts a double from the array starting at the specified index.
+     *
+     * @param payload The payload to extract the double from
+     * @param startingIndex The index into the array from which to extract the integer.
+     * @return A double value composed of the 8 bytes from the array.
+     */
+    protected double getDouble(byte[] payload, int startingIndex) {
+
+        // Index would overlap with CRC or exceed array
+        if (startingIndex + Double.BYTES > payload.length - 4) {
+            return -1.0;
+        }
+
+        return this.convertBytesToDouble(Arrays.copyOfRange(payload, startingIndex, startingIndex + Double.BYTES));
+    }
+
+
+    /**
      * Extracts string from the array by searching for the terminating byte.
      *
      * @param array The byte-array containing the characters of the string

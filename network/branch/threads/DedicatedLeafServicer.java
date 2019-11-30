@@ -27,6 +27,9 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
     // The logger instance for this class.
     private static SmartLog logger = new SmartLog(DedicatedLeafServicer.class.getName());
 
+    // The account of the leaf under service.
+    private Account account;
+
     // The thread that this instance runs in.
     private Thread serviceThread;
 
@@ -52,6 +55,15 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
         // Start the servicer once initialization is complete
         this.serviceThread = new Thread(this, "LeafServicer-" + leafAddress.getPort());
         this.serviceThread.start();
+    }
+
+    /**
+     * Retrieve the Account of the leaf being service.
+     *
+     * @return The account object providing valuable persistent information about the leaf.
+     */
+    public Account getAccount() {
+        return this.account;
     }
 
     /**
@@ -100,12 +112,9 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
     @Override
     public void run() {
 
-
-        Account account = null;
-
         // Invoke the registered onLeafConnection handler for this starting leaf connection.
         try {
-            account = this.branch.getAccountHandler().onLeafConnection(this.getDestination().getIpAddress());
+            this.account = this.branch.getAccountHandler().onLeafConnection(this.getDestination().getIpAddress());
         } catch (SmartgrowDatabaseException | IOException ex) {
 
             // Inability to perform account discovery operations disallows us
@@ -140,7 +149,7 @@ public class DedicatedLeafServicer extends Transport implements Runnable {
                 }
 
                 // Invoke the packet manager that will return a packet we can send back to the leaf.
-                this.send(this.branch.manage(account, request));
+                this.send(this.branch.manage(this.account, request));
             }
         } catch (TransportInterruptedException ex) {
             logger.info("Ending servicer for " + this.getDestination());

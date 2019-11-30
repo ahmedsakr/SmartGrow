@@ -3,6 +3,7 @@ package network.core.packets.plants;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import logging.SmartLog;
 import network.core.OpCodes;
 import network.core.Packet;
 
@@ -17,8 +18,9 @@ import network.core.Packet;
  */
 public class AvailablePlants extends Packet {
 
+    private static SmartLog logger = new SmartLog(AvailablePlants.class.getName());
     // The structure holding the plant id-name pairs
-    private HashMap<Byte, String> plants;
+    private HashMap<Integer, String> plants;
 
     /**
      * Initialize the AvailablePlants object.
@@ -35,16 +37,16 @@ public class AvailablePlants extends Packet {
      * @param plantId The unique id of the plant
      * @param plantName The name of the plant
      */
-    public void addPlant(byte plantId, String plantName) {
+    public void addPlant(int plantId, String plantName) {
         this.plants.put(plantId, plantName);
-    }
+     }
 
     /**
      * Retrieve the whole set of plants in this packet.
      *
      * @return The HashMap composed of all plant id-name pairs.
      */
-    public HashMap<Byte, String> getPlants() {
+    public HashMap<Integer, String> getPlants() {
         return this.plants;
     }
 
@@ -61,21 +63,28 @@ public class AvailablePlants extends Packet {
     protected void extract(byte[] payload) {
 
         String plantName = null;
-        for (int i = 0; payload[i] != 0 && i < payload.length; ) {
+
+        int index = 0, plantId = 0;
+        while (index < payload.length - 4) {
+ 
+            plantId = super.getInt(payload, index);
+
+            // A plant id of zero is not valid and means there are no more entries.
+            if (plantId == 0) {
+                break;
+            }
             
             // Get the plant name for the associated plant id
-            plantName = super.getString(Arrays.copyOfRange(payload, i + 1, payload.length));
+            plantName = super.getString(Arrays.copyOfRange(payload, index + Integer.BYTES, payload.length));
+            this.plants.put(plantId, plantName);
 
-            // Add the plant to the set if its name is not null or empty.
-            if (plantName != null && plantName.length() > 0) {
-                this.plants.put(payload[i], plantName);
-
-                // Move the index to the next entry
-                // - 1 byte for the plant id
-                // - x bytes for the plant name
-                // - 1 byte for the null-byte.
-                i += (1 + plantName.length() + 1);
-            }
+            /*
+             * Move the index to the next entry
+             * - 4 byte for the plant id
+             * - x bytes for the plant name
+             * - 1 byte for the null-byte.
+             */
+            index += (Integer.BYTES + plantName.length() + 1);
         }
     }
 
@@ -87,8 +96,8 @@ public class AvailablePlants extends Packet {
      */
     @Override
     protected void build() {
-        for (byte plantId : this.plants.keySet()) {
-            super.addByte(plantId);
+        for (int plantId : this.plants.keySet()) {
+            super.addInt(plantId);
             super.addString(this.plants.get(plantId));
         }
     }
