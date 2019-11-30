@@ -24,23 +24,67 @@ import network.leaf.Leaf;
 public class RealtimeSensors extends Thread {
 
     private SmartLog logger = new SmartLog(RealtimeSensors.class.getName());
-
+    private Leaf leaf;
     private MainActivity activity;
 
     public RealtimeSensors(MainActivity activity) {
         super("RealtimeSensors");
         this.activity = activity;
+
+        // Immediately start the sensors thread
         this.start();
+    }
+
+    /*
+     * Request the latest sensors information from the server.
+     */
+    private SensorsData getSensorsData() throws IOException, CorruptPacketException {
+
+        SensorsData data = null;
+        RequestSensors request = new RequestSensors();
+
+        /*
+         * Keep sending a request for SensorsData until the server responds to us.
+         */
+        while (data == null) {
+            // Send the request for fresh sensor data to the server.
+            this.leaf.send(request);
+
+            // Wait for the response from the server.
+            data = (SensorsData) leaf.receiveWithTimeout();
+        }
+
+        return data;
+    }
+
+    /*
+     * Update the sensors shown on the screen using the provided sensors.
+     */
+    private void updateSensorsOnScreen(SensorsData data) {
+        TextView temperature = activity.findViewById(R.id.temperature_sensor_data);
+        TextView airHumidity = activity.findViewById(R.id.humidity_sensor_data);
+        TextView lightIntensity = activity.findViewById(R.id.light_intensity_data);
+        TextView soilMoisture = activity.findViewById(R.id.soil_moisture_data);
+
+        // Update the sensor information on the screen
+        activity.runOnUiThread(() -> {
+            temperature.setText(String.format(Locale.CANADA, "%.1f",
+                    data.getSensorData(SupportedSensors.AIR_TEMPERATURE)));
+            airHumidity.setText(String.format(Locale.CANADA, "%.1f",
+                    data.getSensorData(SupportedSensors.AIR_HUMIDITY)));
+            lightIntensity.setText(String.format(Locale.CANADA, "%.1f",
+                    data.getSensorData(SupportedSensors.LIGHT_INTENSITY)));
+            soilMoisture.setText(String.format(Locale.CANADA, "%.1f",
+                    data.getSensorData(SupportedSensors.SOIL_MOISTURE)));
+        });
     }
 
     @Override
     public void run() {
 
-        // Initialize a connection in the SmartGrow system.
-        Leaf leaf;
-
+        // Initialize the leaf that will be used in communicating with the server
         try {
-            leaf = new Leaf(Identity.ANDROID_USER);
+            this.leaf = new Leaf(Identity.ANDROID_USER);
         } catch (SocketException ex) {
 
             // Prematurely terminate if we can't get hold of a leaf object.
@@ -48,28 +92,15 @@ public class RealtimeSensors extends Thread {
             return;
         }
 
-
-        RequestSensors request = new RequestSensors();
-        TextView temperature = activity.findViewById(R.id.textView2);
-        TextView airHumidity = activity.findViewById(R.id.textView4);
-        TextView lightIntensity = activity.findViewById(R.id.textView6);
-        TextView soilMoisture = activity.findViewById(R.id.textView8);
         try {
+
             while (true) {
 
-                // Send the request for fresh sensor data to the server.
-                leaf.send(request);
+                // Retrieve the latest sensors from the server
+                SensorsData data = getSensorsData();
 
-                // Wait for the response from the server.
-                SensorsData data = (SensorsData) leaf.receive();
-
-                // Update the sensor information on the screen
-                activity.runOnUiThread(() -> {
-                    temperature.setText(String.format(Locale.CANADA, "%.1f °C", data.getSensorData(SupportedSensors.AIR_TEMPERATURE)));
-                    airHumidity.setText(String.format(Locale.CANADA, "%.1f %%RH", data.getSensorData(SupportedSensors.AIR_HUMIDITY)));
-                    lightIntensity.setText(String.format(Locale.CANADA, "%.1f Wb", data.getSensorData(SupportedSensors.LIGHT_INTENSITY)));
-                    soilMoisture.setText(String.format(Locale.CANADA, "%.1f Ba", data.getSensorData(SupportedSensors.SOIL_MOISTURE)));
-                });
+                // Update the sensors information on the interface to the latest ones
+                updateSensorsOnScreen(data);
 
                 // Sleep for a second before requesting another fresh batch of sensors.
                 Thread.sleep(1000);
