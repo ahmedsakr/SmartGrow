@@ -89,11 +89,44 @@ public class RealtimeSensors extends Thread implements BroadcastHandler, Adapter
             this.selectedPlantId = -1;
         }
 
+        // Create a new spinner adapter with the newly retrieved plant names
+        Object[] plantNames = this.activePlants.getPlants().values().toArray();
         ArrayAdapter<Object> adapter = new ArrayAdapter<>(
-                this.activity, R.layout.support_simple_spinner_dropdown_item,
-                this.activePlants.getPlants().values().toArray());
+                this.activity, R.layout.support_simple_spinner_dropdown_item, plantNames);
         adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item);
 
+        /*
+         * Since a new list of active plants has come in, we must update the list
+         * shown to the user without erasing their current plant selection.
+         *
+         * In order to preserve the user's plant selection, we compare if the plant they
+         * were viewing is in the new list. If it is in the new list, then we select
+         * its position.
+         *
+         * However, if the plant is not longer in the list, then we forget
+         * what the user's choice and default to the first one. This happens when a plant
+         * is no longer active.
+         */
+        String currentPlantName = (String) this.availablePlants.getSelectedItem();
+        for (int i = 0; i < this.activePlants.getPlants().size(); i++) {
+            String plantName = (String) plantNames[i];
+
+            if (plantName.equals(currentPlantName)) {
+
+                // Perfect - we found that the plant exists in the new list!
+                // Save its position in the new list and update the selection in the spinner.
+                int selectedPosition = i;
+                this.activity.runOnUiThread(() -> {
+                    this.availablePlants.setAdapter(adapter);
+                    this.availablePlants.setSelection(selectedPosition);
+                });
+
+                return;
+            }
+        }
+        
+        // Either the plant list is empty or the user's original plant selection is no longer
+        // active. Simply just update the spinner without worrying about erasing the user's choice.
         this.activity.runOnUiThread(() -> this.availablePlants.setAdapter(adapter));
     }
 

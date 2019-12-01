@@ -38,6 +38,9 @@ public class AccountManager implements LeafAccountHandler {
     // Local addresses obtained from all discovered interfaces on the machine.
     private ArrayList<String> localAddresses;
 
+    // The initial simulated plant id counter
+    private int plantSimulationIdCounter = 1000;
+
     /**
      * Initialize an AccountManager for the SmartGrow server.
      *
@@ -59,7 +62,12 @@ public class AccountManager implements LeafAccountHandler {
      * @return The Account object for the leaf
      */
     @Override
-    public Account onLeafConnection(String address) throws SmartgrowDatabaseException, IOException {
+    public synchronized Account onLeafConnection(String address) throws SmartgrowDatabaseException, IOException {
+        
+        // Increase the plant id counter if this leaf connection is from a simulated plant endpoint.
+        if (isLocalAddress(address)) {
+            this.plantSimulationIdCounter++;
+        }
 
         // Create an account for the leaf if it does not already have one
         if (this.getAccount(address) == null) {
@@ -78,12 +86,24 @@ public class AccountManager implements LeafAccountHandler {
      *         leaf has never been seen before, null is returned.
      */
     public Account getAccount(String address) throws SmartgrowDatabaseException, IOException {
-        int leafId = this.accounts.getLeafId(this.getMACAddress(address));
 
+        // Retrieve the MAC address associated with that address
+        String macAddr = this.getMACAddress(address);
+
+        /**
+         * Simulations run on the same machine as the server. We don't need
+         * to store their MAC addresses, but we give them a temporary account
+         * while they are running.
+         */
+        if (isLocalAddress(address)) {
+            return new Account(this.plantSimulationIdCounter, macAddr);
+        }
+
+        int leafId = this.accounts.getLeafId(macAddr);
         if (leafId == LeafAccounts.ACCOUNT_DOES_NOT_EXIST) {
             return null;
         } else {
-            return new Account(leafId, address);
+            return new Account(leafId, macAddr);
         }
     }
 
@@ -97,6 +117,18 @@ public class AccountManager implements LeafAccountHandler {
     }
 
     /**
+     * Check if the address is found on one of the local network interfaces on this
+     * machine.
+     *
+     * @param address The IPv4 address of the destination
+     * @return        True if it is local
+     *                False otherwise
+     */
+    private boolean isLocalAddress(String address) {
+        return this.localAddresses.contains(address);
+    }
+
+    /**
      * Retrieve the MAC address of the local area network device discovered
      * through the specified address.
      *
@@ -107,7 +139,7 @@ public class AccountManager implements LeafAccountHandler {
     private String getMACAddress(String address) throws IOException {
 
         // Use the NetworkInterface class if the address is a local one (i.e., on the same machine)
-        if (this.localAddresses.contains(address)) {
+        if (isLocalAddress(address)) {
             byte[] macAddr = NetworkInterface.getByInetAddress(InetAddress.getByName(address)).getHardwareAddress();
 
             if (macAddr == null) {
