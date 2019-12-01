@@ -1,5 +1,6 @@
 package com.example.smartgrow;
 
+import android.graphics.Color;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -25,13 +26,28 @@ import network.leaf.Leaf;
  */
 public class RealtimeSensors extends Thread implements BroadcastHandler {
 
+    // The logger for this class
     private SmartLog logger = new SmartLog(RealtimeSensors.class.getName());
+
+    // The leaf for servicing the android app
     private Leaf leaf;
+
     private MainActivity activity;
+
+    // The data to be updated on the screen
+    private TextView temperature, humidity, soilMoisture, lightIntensity;
+
+    // The animation color to trigger when updating the values
+    private int animationColor = Color.rgb(216, 27, 96);
 
     public RealtimeSensors(MainActivity activity) {
         super("RealtimeSensors");
         this.activity = activity;
+
+        this.temperature = activity.findViewById(R.id.temperature_sensor_data);
+        this.humidity = activity.findViewById(R.id.humidity_sensor_data);
+        this.lightIntensity = activity.findViewById(R.id.light_intensity_data);
+        this.soilMoisture = activity.findViewById(R.id.soil_moisture_data);
 
         // Immediately start the sensors thread
         this.start();
@@ -74,21 +90,46 @@ public class RealtimeSensors extends Thread implements BroadcastHandler {
      * Update the sensors shown on the screen using the provided sensors.
      */
     private void updateSensorsOnScreen(SensorsData data) {
-        TextView temperature = activity.findViewById(R.id.temperature_sensor_data);
-        TextView airHumidity = activity.findViewById(R.id.humidity_sensor_data);
-        TextView lightIntensity = activity.findViewById(R.id.light_intensity_data);
-        TextView soilMoisture = activity.findViewById(R.id.soil_moisture_data);
+
 
         // Update the sensor information on the screen
         activity.runOnUiThread(() -> {
             temperature.setText(String.format(Locale.CANADA, "%.1f",
                     data.getSensorData(SupportedSensors.AIR_TEMPERATURE)));
-            airHumidity.setText(String.format(Locale.CANADA, "%.1f",
+            humidity.setText(String.format(Locale.CANADA, "%.1f",
                     data.getSensorData(SupportedSensors.AIR_HUMIDITY)));
             lightIntensity.setText(String.format(Locale.CANADA, "%.1f",
                     data.getSensorData(SupportedSensors.LIGHT_INTENSITY)));
             soilMoisture.setText(String.format(Locale.CANADA, "%.1f",
                     data.getSensorData(SupportedSensors.SOIL_MOISTURE)));
+        });
+    }
+
+    /*
+     * Play a quick font change animation on the sensor data to visually signal that
+     * they updated.
+     */
+    private void playUpdatedSensorAnimation() {
+        int originalColor = this.temperature.getCurrentTextColor();
+
+        activity.runOnUiThread(() -> {
+            this.temperature.setTextColor(this.animationColor);
+            this.humidity.setTextColor(this.animationColor);
+            this.lightIntensity.setTextColor(this.animationColor);
+            this.soilMoisture.setTextColor(this.animationColor);
+        });
+
+        try {
+            Thread.sleep(400);
+        } catch (InterruptedException ex) {
+            logger.warn("Interrupted while sleeping for animation");
+        }
+
+        activity.runOnUiThread(() -> {
+            this.temperature.setTextColor(originalColor);
+            this.humidity.setTextColor(originalColor);
+            this.lightIntensity.setTextColor(originalColor);
+            this.soilMoisture.setTextColor(originalColor);
         });
     }
 
@@ -117,6 +158,9 @@ public class RealtimeSensors extends Thread implements BroadcastHandler {
 
                 // Update the sensors information on the interface to the latest ones
                 updateSensorsOnScreen(data);
+
+                // Play a quick animation to visually convey that sensors updated
+                playUpdatedSensorAnimation();
 
                 // Sleep for a second before requesting another fresh batch of sensors.
                 Thread.sleep(1000);
