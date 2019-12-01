@@ -44,10 +44,11 @@ public class AndroidUserManager implements LeafManager {
             return null;
         }
 
+        RequestSensors request = (RequestSensors) packet;
         try {
 
             // Retrieve the latest sensor values from the plant data.
-            return this.plantsData.getLatestSensorData();
+            return this.plantsData.getSensorsData(request.getPlantId());
 
         } catch (SmartgrowDatabaseException ex) {
             logger.error(ex.getMessage());

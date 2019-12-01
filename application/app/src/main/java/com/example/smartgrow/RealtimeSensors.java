@@ -78,11 +78,15 @@ public class RealtimeSensors extends Thread implements BroadcastHandler, Adapter
      * @param packet The broadcast packet to process
      */
     @Override
-    public void handleBroadcast(Packet packet) {
+    public synchronized void handleBroadcast(Packet packet) {
 
         // Update the latest AvailablePlants packet
-        synchronized (this) {
-            this.activePlants = (AvailablePlants) packet;
+        this.activePlants = (AvailablePlants) packet;
+
+        if (this.activePlants.getPlants().isEmpty()) {
+
+            // There are no active plants in the system.
+            this.selectedPlantId = -1;
         }
 
         ArrayAdapter<Object> adapter = new ArrayAdapter<>(
@@ -102,25 +106,30 @@ public class RealtimeSensors extends Thread implements BroadcastHandler, Adapter
      * @param id The id of the selection
      */
     @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        synchronized (this) {
-            Object chosenValue = parent.getItemAtPosition(position);
+    public synchronized void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        Object chosenValue = parent.getItemAtPosition(position);
 
-            for (int plantId : this.activePlants.getPlants().keySet()) {
-                if (this.activePlants.getPlants().get(plantId).equals(chosenValue)) {
+        if (this.activePlants.getPlants().isEmpty()) {
 
-                    // Save the plant id and exit.
-                    this.selectedPlantId = plantId;
-                    break;
-                }
+            // No plants to select from.
+            this.selectedPlantId = -1;
+            return;
+        }
+
+        // Discover which plantId the user has selected
+        for (int plantId : this.activePlants.getPlants().keySet()) {
+            if (this.activePlants.getPlants().get(plantId).equals(chosenValue)) {
+
+                // Save the plant id and exit.
+                this.selectedPlantId = plantId;
+                break;
             }
-
         }
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-
+        this.selectedPlantId = -1;
     }
 
     /*
@@ -130,6 +139,7 @@ public class RealtimeSensors extends Thread implements BroadcastHandler, Adapter
 
         SensorsData data = null;
         RequestSensors request = new RequestSensors();
+        request.setPlantId(this.selectedPlantId);
 
         /*
          * Keep sending a request for SensorsData until the server responds to us.

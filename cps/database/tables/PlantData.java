@@ -61,9 +61,10 @@ public class PlantData {
      * @return A SensorsData packet containing the latest sensor data
      * @throws SmartgrowDatabaseException
      */
-    public SensorsData getLatestSensorData() throws SmartgrowDatabaseException {
+    public SensorsData getSensorsData(int plantId) throws SmartgrowDatabaseException {
         String sql = String.format(
-            "SELECT * from %s ORDER BY time_taken DESC LIMIT 1", DatabaseInfo.DATABASE_SENSORS_TABLE);
+            "SELECT * from %s WHERE plant_id = %d ORDER BY time_taken DESC LIMIT 1",
+            DatabaseInfo.DATABASE_SENSORS_TABLE, plantId);
 
         // Update the database with the prepared SQL statement.
         ResultSet results = this.database.query(sql);
