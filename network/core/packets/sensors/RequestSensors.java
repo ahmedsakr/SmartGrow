@@ -16,8 +16,32 @@ import network.leaf.Identity;
  */
 public class RequestSensors extends Packet {
 
+    // The plant id to request sensors data for
+    private int plantId;
+
+    /**
+     * Initialize a RequestSensors packet.
+     */
     public RequestSensors() {
         super(OpCodes.REQUEST_SENSORS);
+    }
+
+    /**
+     * Set the plant id for this request.
+     *
+     * @param plantId The integer plant id
+     */
+    public void setPlantId(int plantId) {
+        this.plantId = plantId;
+    }
+
+    /**
+     * Retrieve the plant id for this request.
+     *
+     * @return The integer plant id
+     */
+    public int getPlantId() {
+        return this.plantId;
     }
 
     /**
@@ -31,7 +55,7 @@ public class RequestSensors extends Packet {
      */
     @Override
     protected void extract(byte[] payload) {
-
+        this.plantId = super.getInt(payload, 0);
     }
 
     /**
@@ -42,6 +66,6 @@ public class RequestSensors extends Packet {
      */
     @Override
     protected void build() {
-
+        super.addInt(this.plantId);
     }
 }

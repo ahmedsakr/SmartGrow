@@ -37,10 +37,10 @@ public class SensorsDataUnittest {
         SensorsData data = new SensorsData();
 
         // Check that all sensors are initialized to -1
-        assertEquals(-1.0, data.getSensorData(SupportedSensors.LIGHT_INTENSITY), 0.001); 
-        assertEquals(-1.0, data.getSensorData(SupportedSensors.SOIL_MOISTURE), 0.001);
-        assertEquals(-1.0, data.getSensorData(SupportedSensors.AIR_TEMPERATURE), 0.001);
-        assertEquals(-1.0, data.getSensorData(SupportedSensors.AIR_HUMIDITY), 0.001);
+        assertEquals(0.0, data.getSensorData(SupportedSensors.LIGHT_INTENSITY), 0.001); 
+        assertEquals(0.0, data.getSensorData(SupportedSensors.SOIL_MOISTURE), 0.001);
+        assertEquals(0.0, data.getSensorData(SupportedSensors.AIR_TEMPERATURE), 0.001);
+        assertEquals(0.0, data.getSensorData(SupportedSensors.AIR_HUMIDITY), 0.001);
     }
 
     /**

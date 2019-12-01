@@ -85,10 +85,10 @@ public class SensorsData extends Packet {
      * Initialize the sensors value to -1.
      */
     private void initialize() {
-        this.data.put(SupportedSensors.AIR_HUMIDITY, -1.0);
-        this.data.put(SupportedSensors.AIR_TEMPERATURE, - 1.0);
-        this.data.put(SupportedSensors.LIGHT_INTENSITY, -1.0);
-        this.data.put(SupportedSensors.SOIL_MOISTURE, -1.0);
+        this.data.put(SupportedSensors.AIR_HUMIDITY, 0.0);
+        this.data.put(SupportedSensors.AIR_TEMPERATURE, 0.0);
+        this.data.put(SupportedSensors.LIGHT_INTENSITY, 0.0);
+        this.data.put(SupportedSensors.SOIL_MOISTURE, 0.0);
     }
 
     /**
