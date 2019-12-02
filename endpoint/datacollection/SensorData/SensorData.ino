@@ -25,7 +25,7 @@ void setup() {
     pinMode(SMSensorPin, INPUT);
     pinMode(PRPin, INPUT);
     
-    msg[0] = 3; //OPCODE 3 for SensorData   
+    msg[0] = 2; //OPCODE 2 for SensorData   
 }
 
 void loop() {   
