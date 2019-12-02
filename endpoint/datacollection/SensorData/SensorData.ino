@@ -39,10 +39,11 @@ void loop(){
     lightSource();
     moistureContent();
     dhtValues();
-    
+/*    
     for (int i = 0; i < sizeof(msg); i++){
       Serial.print(msg[i]);
     }
+*/
     delay(DELAY);
 }
 

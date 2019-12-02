@@ -1,3 +1,5 @@
+package endpoint.serial;
+
 /**
 Code from: http://rxtx.qbang.org/wiki/index.php/Two_way_communcation_with_the_serial_port
 Edited by: Valerie Figuracion
@@ -5,7 +7,7 @@ Edited by: Valerie Figuracion
  * RaspPi-Arduino Serial Communication
  **/
 
-package endpoint.serial;
+ 
 
 import endpoint.sensors.SupportedSensors;
 
