@@ -1,34 +1,40 @@
 #include "dht11.h"
 #define DELAY 5000 //5 seconds
 
+//initialize the pins to the ports on the arduino uno
 dht11 DHT;
 const int SMSensorPin = A0;
 const int PRPin = A1;
 const int DHTPin = 4;
 
+//analog to digital converter value
 const double ADCValue = 0.0048828125;
 
+//initialize values
 double SMPercent = 0;
 double lux = 0;
 int DHTValue = 0;
 int SMSensorValue = 0;
 int PRValue = 0;
 
+
 unsigned int sizeOfMsg = 512;
-byte msg[512];
+//byte msg[512];
+byte msg[sizeOfMsg];
 
 void setup() {
-    //Start listening to arduino
+    //Start listening to arduino at a specific bps
     Serial.begin(9600);
   
     //Configure inputs
     pinMode(SMSensorPin, INPUT);
     pinMode(PRPin, INPUT);
     
+    //start of the message to be sent to the Pi 
     msg[0] = 2; //OPCODE 2 for SensorData   
 }
 
-void loop() {   
+void loop(){   
       
     lightSource();
     moistureContent();
@@ -40,11 +46,11 @@ void loop() {
     delay(DELAY);
 }
 
-/*Separate each sensor into its own functions
- * 
+/*
+ * Separate each sensor into its own function 
  */
 void lightSource(){
-    //Photoresistor Value OPCODE 1//
+    //Photoresistor Value//
     PRValue = analogRead(PRPin); //get photo resistor value
     //Convert resistor value into lux
     lux = getLux(PRValue);
