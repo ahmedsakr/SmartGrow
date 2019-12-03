@@ -29,10 +29,10 @@ public class SimulatedPlantEndpoint extends Thread {
     private final int SIMULATION_CYCLE_MAX = 30;
 
     // Start values for the sensors
-    private final double AIR_HUMIDITY_START = 25;
+    private final double AIR_HUMIDITY_START = 60;
     private final double AIR_TEMPERATURE_START = 25;
-    private final double SOIL_MOISTURE_START = 25;
-    private final double LIGHT_INTENSITY_START = 25;
+    private final double SOIL_MOISTURE_START = 40;
+    private final double LIGHT_INTENSITY_START = 700;
 
     // The UDP abstraction that we will use to communicate with the server.
     private Leaf leaf;
@@ -46,6 +46,9 @@ public class SimulatedPlantEndpoint extends Thread {
     // How long a full cycle of simulation takes (in seconds)
     private double simulationCycle;
 
+    // The values for this simulation
+    private double air_humidity, air_temperature, soil_moisture, light_intensity;
+
     /**
      * Construct the simulated plant endpoint
      */
@@ -58,6 +61,12 @@ public class SimulatedPlantEndpoint extends Thread {
         // Initialize random values for simulation amplitude and cycle time.
         this.simulationAmplitude = Math.random() * this.SIMULATION_AMPLITUDE_MAX;
         this.simulationCycle = Math.random() * this.SIMULATION_CYCLE_MAX;
+
+        // Generate random starting leaves for this simulation
+        this.air_temperature = this.AIR_TEMPERATURE_START * Math.max(Math.random(), Math.random());
+        this.air_humidity = this.AIR_HUMIDITY_START * Math.max(Math.random(), Math.random());
+        this.soil_moisture = this.SOIL_MOISTURE_START * Math.max(Math.random(), Math.random());
+        this.light_intensity = this.LIGHT_INTENSITY_START * Math.max(Math.random(), Math.random());
         
         // Immediately start the simulation of a plant endpoint.
         this.start();
@@ -99,10 +108,10 @@ public class SimulatedPlantEndpoint extends Thread {
                 data.clear();
                 
                 // Add new simulated values to the SensorsData packet.
-                data.addSensorData(SupportedSensors.AIR_HUMIDITY, getSimulatedValue(this.AIR_HUMIDITY_START));
-                data.addSensorData(SupportedSensors.AIR_TEMPERATURE, getSimulatedValue(this.AIR_TEMPERATURE_START));
-                data.addSensorData(SupportedSensors.LIGHT_INTENSITY, getSimulatedValue(this.LIGHT_INTENSITY_START));
-                data.addSensorData(SupportedSensors.SOIL_MOISTURE, getSimulatedValue(this.SOIL_MOISTURE_START));
+                data.addSensorData(SupportedSensors.AIR_HUMIDITY, getSimulatedValue(this.air_humidity));
+                data.addSensorData(SupportedSensors.AIR_TEMPERATURE, getSimulatedValue(this.air_temperature));
+                data.addSensorData(SupportedSensors.LIGHT_INTENSITY, getSimulatedValue(this.light_intensity));
+                data.addSensorData(SupportedSensors.SOIL_MOISTURE, getSimulatedValue(this.soil_moisture));
 
                 logger.info("Sending SensorsData packet: " + data);
 
