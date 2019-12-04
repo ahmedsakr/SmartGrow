@@ -94,7 +94,7 @@ public class ArduinoPiSerialConnection extends Thread {
 
 		private Leaf leaf;
 		private InputStream in; //port is already open
-		private byte[] msg = new byte[512];
+		private double[] msg = new double[512];
 
 		public SerialReader(InputStream in) { this.in = in; }
 
@@ -117,7 +117,7 @@ public class ArduinoPiSerialConnection extends Thread {
 						while((arduinoData = in.read()) > -1){
 
 							//If the OpCode is not that of SensorsData then the input is not from the arduino
-							if ((byte)in.read() != OpCodes.SENSORS_DATA){
+							if ((double)in.read() != OpCodes.SENSORS_DATA){
 								logger.error("Packet is not from the arduino.");
 								break; //Does not continue to read the input
 							}
@@ -125,7 +125,7 @@ public class ArduinoPiSerialConnection extends Thread {
 
 							//Data from the arduino is translated into bytes
 							//and added to the buffer array
-							msg[len++] = (byte)arduinoData;
+							msg[len++] = (double)arduinoData;
 						}
 					} catch (IOException e){
 						e.printStackTrace();
