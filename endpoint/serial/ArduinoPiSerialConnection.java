@@ -41,12 +41,12 @@ public class ArduinoPiSerialConnection extends Thread {
 	public ArduinoPiSerialConnection(){ super("ArduinoPiSerialConnection"); }
 
 	//Opens the connection between the Arduino and the Pi
-	public void SerialConnection(String portName) throws Exception{
+	public void SerialConnection() throws Exception{
 
 		this.leaf = new Leaf(Identity.PLANT_ENDPOINT);
 
 		//Initializes the port for the serial connection.
-		CommPortIdentifier portID = CommPortIdentifier.getPortIdentifier(portName);
+		CommPortIdentifier portID = CommPortIdentifier.getPortIdentifier("/dev/ttyACM0");
 
 		//Will determine if it is already in use or not
 		if( portID.isCurrentlyOwned() ) {
@@ -65,7 +65,7 @@ public class ArduinoPiSerialConnection extends Thread {
 				SerialPort serialPort = (SerialPort) port;
 
 				//Initialize parameters for the SerialPort (on Arduino I think)
-				serialPort.setSerialPortParams( 9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE );
+				serialPort.setSerialPortParams( 115200, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE );
 
 				//Initializes input stream for the serial port
 				InputStream in = serialPort.getInputStream();
@@ -167,7 +167,7 @@ public class ArduinoPiSerialConnection extends Thread {
 		try{
 			//connection will ideally connect the pi and the arduino through the correct port
 			ArduinoPiSerialConnection apsc = new ArduinoPiSerialConnection();
-			apsc.SerialConnection("ttyACM0"); //Top right USB Port
+			apsc.SerialConnection(); //Top right USB Port
 		} catch(Exception e){
 			e.printStackTrace();
 		}
