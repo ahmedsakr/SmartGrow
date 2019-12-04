@@ -1,5 +1,5 @@
 #include "dht11.h"
-#define DELAY 5000 //5 seconds
+#define DELAY 10000 //5 seconds
 
 //initialize the pins to the ports on the arduino uno
 dht11 DHT;
@@ -17,7 +17,6 @@ int DHTValue = 0;
 int SMSensorValue = 0;
 int PRValue = 0;
 
-unsigned int sizeOfMsg = 512;
 byte msg[512];
 
 void setup() {
@@ -37,21 +36,12 @@ void loop(){
     lightSource();
     moistureContent();
     dhtValues();
-<<<<<<< HEAD
     
     for (int i = 0; i < sizeof(msg)/8; i++){
       Serial.print(msg[i]);
     }
     Serial.print("\n");
     Serial.println("End of Mesage");
-    
-=======
-/*    
-    for (int i = 0; i < sizeof(msg); i++){
-      Serial.print(msg[i]);
-    }
-*/
->>>>>>> 4bd825b122a0011526cb63e36be594ea3ac4a33d
     delay(DELAY);
 }
 
@@ -59,105 +49,56 @@ void loop(){
  * Separate each sensor into its own function 
  */
 void lightSource(){
+    int lightMsgPosition = 1;
+    
     //Photoresistor Value//
     PRValue = analogRead(PRPin); //get photo resistor value
     //Convert resistor value into lux
     lux = getLux(PRValue);
-  
-    byte lightDataToByte = byte(lux);
-
-    msg[1] = 1;
-    msg[2] = lightDataToByte;    
-    Serial.print(lightDataToByte);
-    Serial.print("\t");
+    double luxAP = lux - (int)lux;
+    
+    msg[lightMsgPosition] = 1;
+    msg[lightMsgPosition+1] = (byte) lux;
+    msg[lightMsgPosition+2] = (byte) luxAP;
+    
     Serial.println(lux);
-
-//Code to print information to the serial monitor
-/*
-    if (lux <= 1){
-        Serial.println("Lux value is not available");
-    }else{
-        Serial.print(lux);
-        Serial.println(" Lux Value");
-    }
-    */
+    
 }
 
 void moistureContent(){
+    int soilMsgPosition = 10;
+    
     SMSensorValue = analogRead(SMSensorPin); //get soil moisture value
     //convert moisture value into moisture percentage
     SMPercent = SMConvertToPercentage(SMSensorValue); 
-
-    byte soilDataToByte = byte(SMPercent);
-
-    msg[10] = 2;
-    msg[11] = soilDataToByte;
-    Serial.print(soilDataToByte);
-    Serial.print("\t");
+    double SMPercentAP = (SMPercent - (int)SMPercent) * 100;
+    
+    msg[soilMsgPosition] = 2;
+    msg[soilMsgPosition+1] = (byte) SMPercent;
+    msg[soilMsgPosition+2] = (byte) SMPercentAP;
+ 
     Serial.println(SMPercent);
-
-//Code to print information to the serial monitor
-/*
-    Serial.print(SMPercent);
-    Serial.println("% Moisture Level");   
-    */
 }
 
 void dhtValues(){
-   DHTValue = DHT.read(DHTPin); //get DHT sensor value
-    
-    //Cases will determine if the data read is what is expected.
-    //Otherwise it will send an error.
-/*  Code to print information to the serial monitor
-    switch (DHTValue)
-    {
-      case DHTLIB_OK:  
-        Serial.print("OK, ");
-        break;
-      case DHTLIB_ERROR_CHECKSUM: 
-        Serial.print("Checksum error, ");
-        break;
-      case DHTLIB_ERROR_TIMEOUT: 
-        Serial.print("Time out error, ");
-        break;
-      default: 
-        Serial.print("Unknown error, ");
-        break;
-    }
-*/
+    int temperatureMsgPosition = 19;
+    int humidityMsgPosition = 28;
+     
+    DHTValue = DHT.read(DHTPin); //get DHT sensor value
 
-    byte temperatureDataToByte = byte(DHT.temperature);
-    byte humidityDataToByte = byte(DHT.humidity);
-
-    msg[19] = 3;
-    msg[20] = temperatureDataToByte;
-    msg[28] = 4;
-    msg[29] = humidityDataToByte;
+    double temperatureAP = (DHT.temperature - (int)DHT.temperature) * 100;
+    double humidityAP = (DHT.humidity - (int)DHT.humidity) * 100;
     
-    Serial.print(temperatureDataToByte);
-    Serial.print("\t");
+    msg[temperatureMsgPosition] = 3;
+    msg[temperatureMsgPosition + 1] = (byte) DHT.temperature;
+    msg[temperatureMsgPosition + 2] = (byte) temperatureAP;
+    
+    msg[humidityMsgPosition] = 4;
+    msg[humidityMsgPosition + 1] = (byte) DHT.humidity;
+    msg[humidityMsgPosition + 2] = (byte) humidityAP;
+    
     Serial.println(DHT.temperature);
-    Serial.print(humidityDataToByte);
-    Serial.print("\t");
     Serial.println(DHT.humidity);
-
-    //Code to print information to the serial monitor
-  /*
-    //TEMPERATURE
-    if (DHT.temperature > 60 | DHT.temperature < -20){
-        Serial.println("Temperature is not within the sensor's range. Reading will not be accurate.");
-    }
-    Serial.print(DHT.temperature);
-    Serial.println(" Temperature Level");
-    //HUMIDITY
-    if (DHT.humidity > 95 | DHT.humidity < 5){
-        Serial.println("Humidity is not within the sensor's range. Reading will not be accurate.");
-    }
-    Serial.print(DHT.humidity);
-    Serial.println(" Humidity Level");
-    Serial.println("END");
-    */
-
 }
 
 /*Returns the soil moisture percentge given the analog input from the soil moisture sensor
@@ -173,5 +114,5 @@ double SMConvertToPercentage(int value){
  *
  */
 double getLux(int PRValue){
-  return (double)(250.0 / (ADCValue * (float)PRValue)) - 50.0;
+  return (double)floor((250.0 / (ADCValue * (float)PRValue)) - 50.0);
 }
