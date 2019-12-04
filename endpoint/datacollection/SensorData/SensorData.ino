@@ -37,6 +37,7 @@ void loop(){
     lightSource();
     moistureContent();
     dhtValues();
+<<<<<<< HEAD
     
     for (int i = 0; i < sizeof(msg)/8; i++){
       Serial.print(msg[i]);
@@ -44,6 +45,13 @@ void loop(){
     Serial.print("\n");
     Serial.println("End of Mesage");
     
+=======
+/*    
+    for (int i = 0; i < sizeof(msg); i++){
+      Serial.print(msg[i]);
+    }
+*/
+>>>>>>> 4bd825b122a0011526cb63e36be594ea3ac4a33d
     delay(DELAY);
 }
 

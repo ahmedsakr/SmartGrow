@@ -1,3 +1,5 @@
+package endpoint.serial;
+
 /**
 Code from: http://rxtx.qbang.org/wiki/index.php/Two_way_communcation_with_the_serial_port
 Edited by: Valerie Figuracion
@@ -5,7 +7,7 @@ Edited by: Valerie Figuracion
  * RaspPi-Arduino Serial Communication
  **/
 
-package endpoint.serial;
+ 
 
 import endpoint.sensors.SupportedSensors;
 
@@ -39,12 +41,20 @@ public class ArduinoPiSerialConnection extends Thread {
 	public ArduinoPiSerialConnection(){ super("ArduinoPiSerialConnection"); }
 
 	//Opens the connection between the Arduino and the Pi
+<<<<<<< HEAD
 	public void SerialConnection(final String portName) throws Exception{
+=======
+	public void SerialConnection() throws Exception{
+>>>>>>> 4bd825b122a0011526cb63e36be594ea3ac4a33d
 
 		this.leaf = new Leaf(Identity.PLANT_ENDPOINT);
 
 		//Initializes the port for the serial connection.
+<<<<<<< HEAD
 		final CommPortIdentifier portID = CommPortIdentifier.getPortIdentifier(portName);
+=======
+		CommPortIdentifier portID = CommPortIdentifier.getPortIdentifier("/dev/ttyACM0");
+>>>>>>> 4bd825b122a0011526cb63e36be594ea3ac4a33d
 
 		//Will determine if it is already in use or not
 		if( portID.isCurrentlyOwned() ) {
@@ -63,7 +73,7 @@ public class ArduinoPiSerialConnection extends Thread {
 				final SerialPort serialPort = (SerialPort) port;
 
 				//Initialize parameters for the SerialPort (on Arduino I think)
-				serialPort.setSerialPortParams( 9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE );
+				serialPort.setSerialPortParams( 115200, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE );
 
 				//Initializes input stream for the serial port
 				final InputStream in = serialPort.getInputStream();
@@ -91,8 +101,13 @@ public class ArduinoPiSerialConnection extends Thread {
 		private final SmartLog logger = new SmartLog(SerialReader.class.getName());
 
 		private Leaf leaf;
+<<<<<<< HEAD
 		private final InputStream in; //port is already open
 		private final byte[] msg = new byte[512];
+=======
+		private InputStream in; //port is already open
+		private double[] msg = new double[512];
+>>>>>>> 4bd825b122a0011526cb63e36be594ea3ac4a33d
 
 		public SerialReader(final InputStream in) { this.in = in; }
 
@@ -115,7 +130,7 @@ public class ArduinoPiSerialConnection extends Thread {
 						while((arduinoData = in.read()) > -1){
 
 							//If the OpCode is not that of SensorsData then the input is not from the arduino
-							if ((byte)in.read() != OpCodes.SENSORS_DATA){
+							if ((double)in.read() != OpCodes.SENSORS_DATA){
 								logger.error("Packet is not from the arduino.");
 								break; //Does not continue to read the input
 							}
@@ -123,7 +138,7 @@ public class ArduinoPiSerialConnection extends Thread {
 
 							//Data from the arduino is translated into bytes
 							//and added to the buffer array
-							msg[len++] = (byte)arduinoData;
+							msg[len++] = (double)arduinoData;
 						}
 					} catch (final IOException e){
 						e.printStackTrace();
@@ -165,9 +180,15 @@ public class ArduinoPiSerialConnection extends Thread {
 		final Enumeration listOfPorts = CommPortIdentifier.getPortIdentifier();
 		try{
 			//connection will ideally connect the pi and the arduino through the correct port
+<<<<<<< HEAD
 			final ArduinoPiSerialConnection apsc = new ArduinoPiSerialConnection();
 			apsc.SerialConnection("ttyACM0"); //Top right USB Port
 		} catch(final Exception e){
+=======
+			ArduinoPiSerialConnection apsc = new ArduinoPiSerialConnection();
+			apsc.SerialConnection(); //Top right USB Port
+		} catch(Exception e){
+>>>>>>> 4bd825b122a0011526cb63e36be594ea3ac4a33d
 			e.printStackTrace();
 		}
 	}
