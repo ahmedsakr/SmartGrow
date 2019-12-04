@@ -31,7 +31,7 @@ import network.leaf.Leaf;
 public class ArduinoPiSerialConnection extends Thread {
 
 	//Creates a logger instance for the class
-	private SmartLog logger = new SmartLog(ArduinoPiSerialConnection.class.getName());
+	private final SmartLog logger = new SmartLog(ArduinoPiSerialConnection.class.getName());
 
 	//Initialize the leaf
 	private Leaf leaf;
@@ -39,34 +39,34 @@ public class ArduinoPiSerialConnection extends Thread {
 	public ArduinoPiSerialConnection(){ super("ArduinoPiSerialConnection"); }
 
 	//Opens the connection between the Arduino and the Pi
-	public void SerialConnection(String portName) throws Exception{
+	public void SerialConnection(final String portName) throws Exception{
 
 		this.leaf = new Leaf(Identity.PLANT_ENDPOINT);
 
 		//Initializes the port for the serial connection.
-		CommPortIdentifier portID = CommPortIdentifier.getPortIdentifier(portName);
+		final CommPortIdentifier portID = CommPortIdentifier.getPortIdentifier(portName);
 
 		//Will determine if it is already in use or not
 		if( portID.isCurrentlyOwned() ) {
 			logger.error("Error: Port is currently in use");
 		}
 		else {
-			int timeout = 2000;
+			final int timeout = 2000;
 
 			//Opens the port of the serial connection
-			CommPort port = portID.open(this.getClass().getName(), timeout);
+			final CommPort port = portID.open(this.getClass().getName(), timeout);
 
 			//SerialPort is subclass of CommPort. Will initialize if CommPort is a SerialPort.
 			if(port instanceof SerialPort) {
 
 				//Masks CommPort into SerialPort
-				SerialPort serialPort = (SerialPort) port;
+				final SerialPort serialPort = (SerialPort) port;
 
 				//Initialize parameters for the SerialPort (on Arduino I think)
 				serialPort.setSerialPortParams( 9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE );
 
 				//Initializes input stream for the serial port
-				InputStream in = serialPort.getInputStream();
+				final InputStream in = serialPort.getInputStream();
 
 				//SerialReader thread starts
 				 (new Thread(new ArduinoPiSerialConnection())).start();
@@ -88,20 +88,20 @@ public class ArduinoPiSerialConnection extends Thread {
 	public static class SerialReader implements SerialPortEventListener {
 
 		//Creates a logger instance for the class
-		private SmartLog logger = new SmartLog(SerialReader.class.getName());
+		private final SmartLog logger = new SmartLog(SerialReader.class.getName());
 
 		private Leaf leaf;
-		private InputStream in; //port is already open
-		private byte[] msg = new byte[512];
+		private final InputStream in; //port is already open
+		private final byte[] msg = new byte[512];
 
-		public SerialReader(InputStream in) { this.in = in; }
+		public SerialReader(final InputStream in) { this.in = in; }
 
 		//Will handle the data that arrives in the port
-		public void serialEvent(SerialPortEvent arg0){
+		public void serialEvent(final SerialPortEvent arg0){
 			int arduinoData;
 
 			while(true) {
-				SensorsData data = new SensorsData();
+				final SensorsData data = new SensorsData();
 
 				try {
 					Thread.sleep(1000);
@@ -125,17 +125,17 @@ public class ArduinoPiSerialConnection extends Thread {
 							//and added to the buffer array
 							msg[len++] = (byte)arduinoData;
 						}
-					} catch (IOException e){
+					} catch (final IOException e){
 						e.printStackTrace();
 						System.exit(-1);
 					}
 
 					//Byte arrangement corresponds with the arrangement in SensorData.ino
 					//Hardcoded for now
-					int lightData = (int)msg[2];
-					int soilData = (int)msg[11];
-					int tempData = (int)msg[20];
-					int humidData = (int)msg[29];
+					final int lightData = (int)msg[2];
+					final int soilData = (int)msg[11];
+					final int tempData = (int)msg[20];
+					final int humidData = (int)msg[29];
 
 					data.addSensorData(SupportedSensors.AIR_HUMIDITY, humidData);
 					data.addSensorData(SupportedSensors.AIR_TEMPERATURE, tempData);
@@ -161,12 +161,13 @@ public class ArduinoPiSerialConnection extends Thread {
 	}
 
 	//Main method so it can do stuff
-	public static void main(String args[]){
+	public static void main(final String args[]){
+		final Enumeration listOfPorts = CommPortIdentifier.getPortIdentifier();
 		try{
 			//connection will ideally connect the pi and the arduino through the correct port
-			ArduinoPiSerialConnection apsc = new ArduinoPiSerialConnection();
+			final ArduinoPiSerialConnection apsc = new ArduinoPiSerialConnection();
 			apsc.SerialConnection("ttyACM0"); //Top right USB Port
-		} catch(Exception e){
+		} catch(final Exception e){
 			e.printStackTrace();
 		}
 	}

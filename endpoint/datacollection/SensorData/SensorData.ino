@@ -17,14 +17,12 @@ int DHTValue = 0;
 int SMSensorValue = 0;
 int PRValue = 0;
 
-
 unsigned int sizeOfMsg = 512;
-//byte msg[512];
-byte msg[sizeOfMsg];
+byte msg[512];
 
 void setup() {
     //Start listening to arduino at a specific bps
-    Serial.begin(9600);
+    Serial.begin(115200);
   
     //Configure inputs
     pinMode(SMSensorPin, INPUT);
@@ -40,9 +38,12 @@ void loop(){
     moistureContent();
     dhtValues();
     
-    for (int i = 0; i < sizeof(msg); i++){
+    for (int i = 0; i < sizeof(msg)/8; i++){
       Serial.print(msg[i]);
     }
+    Serial.print("\n");
+    Serial.println("End of Mesage");
+    
     delay(DELAY);
 }
 
@@ -59,16 +60,19 @@ void lightSource(){
 
     msg[1] = 1;
     msg[2] = lightDataToByte;    
+    Serial.print(lightDataToByte);
+    Serial.print("\t");
+    Serial.println(lux);
 
 //Code to print information to the serial monitor
-
+/*
     if (lux <= 1){
         Serial.println("Lux value is not available");
     }else{
         Serial.print(lux);
         Serial.println(" Lux Value");
     }
-    
+    */
 }
 
 void moistureContent(){
@@ -80,13 +84,15 @@ void moistureContent(){
 
     msg[10] = 2;
     msg[11] = soilDataToByte;
-    Serial.println(soilDataToByte);
+    Serial.print(soilDataToByte);
+    Serial.print("\t");
+    Serial.println(SMPercent);
 
 //Code to print information to the serial monitor
-
+/*
     Serial.print(SMPercent);
-    Serial.println("% Moisture Level");
-    
+    Serial.println("% Moisture Level");   
+    */
 }
 
 void dhtValues(){
@@ -120,11 +126,15 @@ void dhtValues(){
     msg[28] = 4;
     msg[29] = humidityDataToByte;
     
-    //Serial.println(temperatureDataToByte);
-   // Serial.println(humidityDataToByte);
+    Serial.print(temperatureDataToByte);
+    Serial.print("\t");
+    Serial.println(DHT.temperature);
+    Serial.print(humidityDataToByte);
+    Serial.print("\t");
+    Serial.println(DHT.humidity);
 
-//  Code to print information to the serial monitor
-  
+    //Code to print information to the serial monitor
+  /*
     //TEMPERATURE
     if (DHT.temperature > 60 | DHT.temperature < -20){
         Serial.println("Temperature is not within the sensor's range. Reading will not be accurate.");
@@ -138,6 +148,7 @@ void dhtValues(){
     Serial.print(DHT.humidity);
     Serial.println(" Humidity Level");
     Serial.println("END");
+    */
 
 }
 
