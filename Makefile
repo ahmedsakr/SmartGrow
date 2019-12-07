@@ -37,6 +37,10 @@ compile-simulation:
 	@echo "Compiling simulation"
 	@javac -proc:none -d "${DIST_PATH}" -cp "${JAVA_LIBRARIES}:." ${SIMULATION_MAIN}
 
+compile-serial:
+	@echo "Compiling serial"
+	@javac -proc:none -d "${DIST_PATH}" -cp "${JAVA_LIBRARIES}:." endpoint/serial/ArduinoPiSerialConnection.java
+
 logging-library:
 	@echo "Creating SmartLog Library"
 	@jar cf ${LOGGING_JAR} -C ${DIST_PATH} logging
